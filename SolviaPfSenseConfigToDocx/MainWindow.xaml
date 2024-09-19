@@ -3,21 +3,43 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="PfSense Config Reader" Height="500" Width="600" KeyDown="Window_KeyDown">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- For the label and buttons -->
+            <RowDefinition Height="Auto"/>
+            <!-- For checkboxes -->
+            <RowDefinition Height="*"/>
+            <!-- For RichTextBox, using * to fill available space -->
+        </Grid.RowDefinitions>
+
         <!-- Label for Ctrl-F -->
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" FontSize="14" Foreground="Gray">Ctrl-F to search</TextBlock>
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" FontSize="14" Foreground="Gray" Grid.Row="0">Ctrl-F to search</TextBlock>
 
         <!-- Select File Button -->
-        <Button Content="Select File" Width="150" Height="40" HorizontalAlignment="Center" VerticalAlignment="Top" Click="SelectFileButton_Click" Margin="0,40,0,0"/>
-        <Button Content="Export to Docx" Width="150" Height="40" HorizontalAlignment="Center" VerticalAlignment="Top" Click="ExportToDocxButton_Click" Margin="0,90,0,0"/>
+        <Button Content="Select File" Width="150" Height="40" HorizontalAlignment="Center" VerticalAlignment="Top" Click="SelectFileButton_Click" Margin="0,40,0,0" Grid.Row="0"/>
+        <Button Content="Export to Docx" Width="150" Height="40" HorizontalAlignment="Center" VerticalAlignment="Top" Click="ExportToDocxButton_Click" Margin="0,90,0,0" Grid.Row="0"/>
 
         <!-- Search Panel -->
-        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal" Margin="10,80,10,0" Visibility="Collapsed" Name="SearchPanel">
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal" Margin="10,80,10,0" Visibility="Collapsed" Name="SearchPanel" Grid.Row="0">
             <TextBox Name="SearchTextBox" Width="200" Height="25" VerticalAlignment="Center" Margin="0,0,10,0" KeyDown="SearchTextBox_KeyDown"/>
             <Button Content="Search" Width="80" Click="SearchButton_Click"/>
+        </StackPanel>
 
+        <!-- Checkboxes for configurations -->
+        <StackPanel Orientation="Vertical" Grid.Row="1" Margin="10">
+            <CheckBox Content="SystemConfig" x:Name="chkSystemConfig" IsChecked="true"/>
+            <CheckBox Content="IpSecVPNConfig" x:Name="chkIpSecVpnConfig" IsChecked="True"/>
+            <CheckBox Content="Interfaces" x:Name="chkInterfaces" IsChecked="true"/>
+            <CheckBox Content="StaticRoutes" x:Name="chkStaticRoutes" IsChecked="true"/>
+            <CheckBox Content="DHCPConfig" x:Name="chkDHCPConfig" IsChecked="true"/>
+            <CheckBox Content="FirewallConfig" x:Name="chkFirewallConfig" IsChecked="true"/>
+            <CheckBox Content="Certificates and CA" x:Name="chkCertificatesAndCA" IsChecked="true"/>
+            <CheckBox Content="Users" x:Name="chkUsers" IsChecked="true"/>
+            <CheckBox Content="Groups" x:Name="chkGroups" IsChecked="true"/>
+            <CheckBox Content="Other Configurations" x:Name="chkOtherConfigs" IsChecked="true"/>
         </StackPanel>
 
         <!-- RichTextBox for output -->
-        <RichTextBox Name="OutputRichTextBox" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,120,10,10"/>
+        <RichTextBox Name="OutputRichTextBox" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="2"/>
     </Grid>
 </Window>

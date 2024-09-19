@@ -2,7 +2,6 @@
 using DocumentFormat.OpenXml.Wordprocessing;
 using SolviaPfSenseConfigToDocx.DataModels;
 using SolviaPfSenseConfigToDocx.Helpers;
-using System.Collections.Generic;
 
 namespace SolviaPfSenseConfigToDocx.DocumentGenerators
 {
@@ -36,28 +35,43 @@ namespace SolviaPfSenseConfigToDocx.DocumentGenerators
             }
         }
 
-        public static void AddSystemConfigToDocument(SystemConfig systemConfig, Body body, MainDocumentPart mainPart)
+        public static void AddInterfaceConfigToDocument(List<Interface> interfaces, Body body, MainDocumentPart mainDocumentPart)
         {
-            DocumentHelper.AddHeading(body, "General Settings", 2, mainPart);
+            DocumentHelper.AddHeading(body, "General Settings", 2, mainDocumentPart);
+
+            // Add table from systemConfig object to document
+            DocumentHelper.AddTableFromObject(body, interfaces);
+
+        }
+
+        public static void AddSystemConfigToDocument(SystemConfig systemConfig, Body body, MainDocumentPart mainDocumentPart)
+        {
+            DocumentHelper.AddHeading(body, "General Settings", 2, mainDocumentPart);
+
+            // Add table from systemConfig object to document
+            DocumentHelper.AddTableFromObject(body, systemConfig);
+
+            return;
+            DocumentHelper.AddParagraph(body, "Hostname", systemConfig.Hostname);
             DocumentHelper.AddParagraph(body, $"Hostname: {systemConfig.Hostname}");
             DocumentHelper.AddParagraph(body, $"Domain: {systemConfig.Domain}");
             DocumentHelper.AddParagraph(body, $"NextUID: {systemConfig.NextUID}");
             DocumentHelper.AddParagraph(body, $"NextGID: {systemConfig.NextGID}");
 
-            DocumentHelper.AddHeading(body, "Time Servers", 2, mainPart);
+            DocumentHelper.AddHeading(body, "Time Servers", 2, mainDocumentPart);
             foreach (var timeServer in systemConfig.Timeservers)
             {
                 DocumentHelper.AddParagraph(body, $"Time Server: {timeServer}");
             }
 
-            DocumentHelper.AddHeading(body, "DNS Settings", 2, mainPart);
+            DocumentHelper.AddHeading(body, "DNS Settings", 2, mainDocumentPart);
             foreach (var dnsServer in systemConfig.DNSServers)
             {
                 DocumentHelper.AddParagraph(body, $"DNS Server: {dnsServer}");
             }
             DocumentHelper.AddParagraph(body, $"DNS Allow Override: {systemConfig.DNSAllowOverride}");
 
-            DocumentHelper.AddHeading(body, "Power Settings", 2, mainPart);
+            DocumentHelper.AddHeading(body, "Power Settings", 2, mainDocumentPart);
             DocumentHelper.AddParagraph(body, $"AC Mode: {systemConfig.PowerSettings.PowerdAcMode}");
             DocumentHelper.AddParagraph(body, $"Battery Mode: {systemConfig.PowerSettings.PowerdBatteryMode}");
             DocumentHelper.AddParagraph(body, $"Normal Mode: {systemConfig.PowerSettings.PowerdNormalMode}");
@@ -65,7 +79,7 @@ namespace SolviaPfSenseConfigToDocx.DocumentGenerators
             // Add other necessary system config details similarly
         }
 
-        private static void AddIpSecVpnConfigToDocument(IpSecVPNConfig vpnConfig, Body body, MainDocumentPart mainPart)
+        public static void AddIpSecVpnConfigToDocument(IpSecVPNConfig vpnConfig, Body body, MainDocumentPart mainPart)
         {
             DocumentHelper.AddHeading(body, "IPsec Phase 1 Configurations", 2, mainPart);
             foreach (var phase1 in vpnConfig.IPsecPhase1Configs)

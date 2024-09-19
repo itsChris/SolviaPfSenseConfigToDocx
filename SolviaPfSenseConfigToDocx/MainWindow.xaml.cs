@@ -10,7 +10,6 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Word = DocumentFormat.OpenXml.Wordprocessing;  // Alias for Open XML Wordprocessing
 
 namespace SolviaPfSenseConfigToDocx
 {
@@ -19,12 +18,22 @@ namespace SolviaPfSenseConfigToDocx
         private PfSenseConfigParser pfSenseConfigParser;
         private SystemConfig systemConfig;
         private IpSecVPNConfig ipSecVpnConfig;
-
+        private List<Interface> interfaces;
+        private List<StaticRoute> staticRoutes;
+        private DHCPConfig dhcpConfig;
+        private FirewallConfig firewallConfig;
+        private CertificateConfig certificatesAndCA;
+        private List<User> users;
+        private List<Group> groups;
+        private OtherConfigurations otherConfigs;
 
         public MainWindow()
         {
             InitializeComponent();
 
+
+
+            // TODO
             Services.WordDocumentService wordDocumentService = new Services.WordDocumentService();
             wordDocumentService.CreateWordDocument("SampleDocument.docx");
         }
@@ -40,15 +49,15 @@ namespace SolviaPfSenseConfigToDocx
                 // Parse each section
 
                 systemConfig = pfSenseConfigParser.ParseSystemConfig();
-                var users = pfSenseConfigParser.ParseUsers();
-                var groups = pfSenseConfigParser.ParseGroups();
-                var interfaces = pfSenseConfigParser.ParseInterfaces();
-                var staticRoutes = pfSenseConfigParser.ParseStaticRoutes();
-                var dhcpConfig = pfSenseConfigParser.ParseDHCPConfig();
-                var firewallConfig = pfSenseConfigParser.ParseFirewallRulesAndNAT();
+                users = pfSenseConfigParser.ParseUsers();
+                groups = pfSenseConfigParser.ParseGroups();
+                interfaces = pfSenseConfigParser.ParseInterfaces();
+                staticRoutes = pfSenseConfigParser.ParseStaticRoutes();
+                dhcpConfig = pfSenseConfigParser.ParseDHCPConfig();
+                firewallConfig = pfSenseConfigParser.ParseFirewallRulesAndNAT();
                 ipSecVpnConfig = pfSenseConfigParser.ParseIpSecVPNConfig();
-                var certificatesAndCA = pfSenseConfigParser.ParseCertificatesAndCA();
-                var otherConfigs = pfSenseConfigParser.ParseOtherConfigurations();
+                certificatesAndCA = pfSenseConfigParser.ParseCertificatesAndCA();
+                otherConfigs = pfSenseConfigParser.ParseOtherConfigurations();
 
                 OutputRichTextBox.Document.Blocks.Clear(); // Clear previous content
 
@@ -159,19 +168,48 @@ namespace SolviaPfSenseConfigToDocx
             // Use the new ParseConfig method
             Dictionary<string, List<string>> configData = pfSenseConfigParser.ParseConfig();
 
-            string filePath = "PfSenseConfigSummary.docx";
+            string filePath = $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_PfSenseConfigSummary.docx";
 
             ConfigDocumentGenerator.GenerateDocument(systemConfig, ipSecVpnConfig, filePath);
 
-            using (WordprocessingDocument wordDoc = WordprocessingDocument.Create("SystemConfig.docx", DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
+            var docxPath = $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_SystemConfig.docx";
+            using (WordprocessingDocument wordDoc = WordprocessingDocument.Create(docxPath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
             {
                 MainDocumentPart mainPart = wordDoc.AddMainDocumentPart();
                 mainPart.Document = new Document();
                 Body body = mainPart.Document.AppendChild(new Body());
 
-                ConfigDocumentGenerator.AddSystemConfigToDocument(systemConfig, body, mainPart);
+                if (chkSystemConfig.IsChecked == true)
+                    ConfigDocumentGenerator.AddSystemConfigToDocument(systemConfig, body, mainPart);
+
+
+                if (chkIpSecVpnConfig.IsChecked == true)
+                    ConfigDocumentGenerator.AddIpSecVpnConfigToDocument(ipSecVpnConfig, body, mainPart);
+
+                if (chkInterfaces.IsChecked == true)
+                    ConfigDocumentGenerator.AddInterfaceConfigToDocument(interfaces, body, mainPart);
+                if (chkStaticRoutes.IsChecked == true)
+
+                if (chkDHCPConfig.IsChecked == true)
+
+                if (chkFirewallConfig.IsChecked == true)
+
+                if (chkCertificatesAndCA.IsChecked == true)
+
+                if (chkUsers.IsChecked == true)
+
+                if (chkGroups.IsChecked == true)
+
+                if (chkOtherConfigs.IsChecked == true)
+                
                 mainPart.Document.Save();
             }
+            OpenFile(filePath);
+            OpenFile(docxPath);
+
+        }
+        private void OpenFile(string filePath)
+        {
 
             // Prüfe, ob das Dokument erfolgreich erstellt wurde und existiert
             if (File.Exists(filePath))
@@ -188,41 +226,6 @@ namespace SolviaPfSenseConfigToDocx
             {
                 Console.WriteLine("Das Dokument konnte nicht erstellt werden oder wurde nicht gefunden.");
             }
-
-            return;
-
-            using (WordprocessingDocument wordDocument = WordprocessingDocument.Create(filePath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
-            {
-                // Add a main document part.
-                MainDocumentPart mainPart = wordDocument.AddMainDocumentPart();
-
-                // Create the document structure
-                mainPart.Document = new Word.Document();
-                Word.Body body = new Word.Body();
-
-                // Iterate through parsed data and add it to the document
-                foreach (var section in configData)
-                {
-                    // Add section title
-                    Word.Paragraph heading = new Word.Paragraph(new Word.Run(new Word.Text($"Section: {section.Key}")));
-                    heading.ParagraphProperties = new Word.ParagraphProperties(new Word.Justification() { Val = Word.JustificationValues.Center });
-                    heading.ParagraphProperties.SpacingBetweenLines = new Word.SpacingBetweenLines() { After = "200" };
-                    heading.ParagraphProperties.ParagraphStyleId = new Word.ParagraphStyleId() { Val = "Heading1" };
-                    body.Append(heading);
-
-                    // Add section entries
-                    foreach (var entry in section.Value)
-                    {
-                        Word.Paragraph entryParagraph = new Word.Paragraph(new Word.Run(new Word.Text(entry)));
-                        entryParagraph.ParagraphProperties = new Word.ParagraphProperties(new Word.SpacingBetweenLines() { After = "100" });
-                        body.Append(entryParagraph);
-                    }
-                }
-                // Save the changes to the document
-                mainPart.Document.Append(body);
-                mainPart.Document.Save();
-            }
-            MessageBox.Show($"Document saved as {filePath}", "Export Completed", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }
