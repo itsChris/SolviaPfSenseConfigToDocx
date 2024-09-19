@@ -36,7 +36,7 @@ namespace SolviaPfSenseConfigToDocx.DocumentGenerators
             }
         }
 
-        private static void AddSystemConfigToDocument(SystemConfig systemConfig, Body body, MainDocumentPart mainPart)
+        public static void AddSystemConfigToDocument(SystemConfig systemConfig, Body body, MainDocumentPart mainPart)
         {
             DocumentHelper.AddHeading(body, "General Settings", 2, mainPart);
             DocumentHelper.AddParagraph(body, $"Hostname: {systemConfig.Hostname}");

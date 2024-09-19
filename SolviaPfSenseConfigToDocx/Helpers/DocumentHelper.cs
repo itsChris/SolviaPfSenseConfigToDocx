@@ -82,6 +82,8 @@ namespace SolviaPfSenseConfigToDocx.Helpers
             body.Append(paraHeading);
         }
 
+
+
         public static void AddParagraph(Body body, string text)
         {
             Paragraph para = new Paragraph();

@@ -1,8 +1,11 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Win32;
 using SolviaPfSenseConfigToDocx.DataModels;
 using SolviaPfSenseConfigToDocx.DocumentGenerators;
 using SolviaPfSenseConfigToDocx.Parsers;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -159,6 +162,34 @@ namespace SolviaPfSenseConfigToDocx
             string filePath = "PfSenseConfigSummary.docx";
 
             ConfigDocumentGenerator.GenerateDocument(systemConfig, ipSecVpnConfig, filePath);
+
+            using (WordprocessingDocument wordDoc = WordprocessingDocument.Create("SystemConfig.docx", DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
+            {
+                MainDocumentPart mainPart = wordDoc.AddMainDocumentPart();
+                mainPart.Document = new Document();
+                Body body = mainPart.Document.AppendChild(new Body());
+
+                ConfigDocumentGenerator.AddSystemConfigToDocument(systemConfig, body, mainPart);
+                mainPart.Document.Save();
+            }
+
+            // Prüfe, ob das Dokument erfolgreich erstellt wurde und existiert
+            if (File.Exists(filePath))
+            {
+                // Öffne das Dokument
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = filePath,
+                    UseShellExecute = true // Diese Option erlaubt es, das Standardprogramm für die Dateitypzuordnung zu verwenden
+                };
+                Process.Start(psi);
+            }
+            else
+            {
+                Console.WriteLine("Das Dokument konnte nicht erstellt werden oder wurde nicht gefunden.");
+            }
+
+            return;
 
             using (WordprocessingDocument wordDocument = WordprocessingDocument.Create(filePath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
             {
