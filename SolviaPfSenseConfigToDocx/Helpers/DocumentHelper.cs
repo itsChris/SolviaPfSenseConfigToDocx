@@ -135,6 +135,25 @@ namespace SolviaPfSenseConfigToDocx.Helpers
             // Add the paragraph to the body
             body.Append(para);
         }
+        public static void InsertSectionBreak(Body body, SectionMarkValues sectionType)
+        {
+            // Create a new paragraph to contain the section break
+            Paragraph para = new Paragraph(new ParagraphProperties());
+
+            // Create the SectionProperties
+            SectionProperties sectionProps = new SectionProperties();
+            SectionType sectionTypeElement = new SectionType() { Val = sectionType };
+
+            // Add the section type to section properties
+            sectionProps.Append(sectionTypeElement);
+
+            // Append SectionProperties to the paragraph's ParagraphProperties
+            para.ParagraphProperties = new ParagraphProperties();
+            para.ParagraphProperties.Append(sectionProps);
+
+            // Append this paragraph to the document body
+            body.Append(para);
+        }
 
         public static void AddTableFromObject<T>(Body body, T obj)
         {
@@ -163,13 +182,17 @@ namespace SolviaPfSenseConfigToDocx.Helpers
             }
         }
 
-
-
-
-
-
         private static void AddTableFromSingleObject(Body body, object obj)
         {
+
+            // Check if obj is null
+            if (obj == null)
+            {
+                // Handle null object, you can throw an exception, log, or return early
+                return;
+                throw new ArgumentNullException(nameof(obj), "The provided object is null.");
+            }
+
             // Create a new table
             Table table = new Table();
 
@@ -274,7 +297,5 @@ namespace SolviaPfSenseConfigToDocx.Helpers
                    type == typeof(decimal) ||
                    type == typeof(Guid);
         }
-
-
     }
 }

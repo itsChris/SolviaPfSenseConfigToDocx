@@ -3,13 +3,11 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Win32;
 using SolviaPfSenseConfigToDocx.DataModels;
 using SolviaPfSenseConfigToDocx.DocumentGenerators;
+using SolviaPfSenseConfigToDocx.Helpers;
 using SolviaPfSenseConfigToDocx.Parsers;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 
 namespace SolviaPfSenseConfigToDocx
 {
@@ -30,8 +28,6 @@ namespace SolviaPfSenseConfigToDocx
         public MainWindow()
         {
             InitializeComponent();
-
-
 
             // TODO
             Services.WordDocumentService wordDocumentService = new Services.WordDocumentService();
@@ -58,155 +54,112 @@ namespace SolviaPfSenseConfigToDocx
                 ipSecVpnConfig = pfSenseConfigParser.ParseIpSecVPNConfig();
                 certificatesAndCA = pfSenseConfigParser.ParseCertificatesAndCA();
                 otherConfigs = pfSenseConfigParser.ParseOtherConfigurations();
-
-                OutputRichTextBox.Document.Blocks.Clear(); // Clear previous content
-
-                // Add SystemConfig data
-                AddTextToRichTextBox($"Hostname: {systemConfig.Hostname}", Brushes.Blue, 16, FontWeights.Bold);
-                AddTextToRichTextBox($"Domain: {systemConfig.Domain}", Brushes.Black, 14, FontWeights.Normal);
-                AddTextToRichTextBox($"Next UID: {systemConfig.NextUID}", Brushes.Black, 14, FontWeights.Normal);
-                AddTextToRichTextBox($"Next GID: {systemConfig.NextGID}", Brushes.Black, 14, FontWeights.Normal);
-
-                // Add other sections in similar fashion...
-
-                AddTextToRichTextBox("XML Parsing Completed.", Brushes.Green, 14, FontWeights.Bold);
             }
-        }
-
-
-        private void AddTextToRichTextBox(string text, Brush color, double fontSize, FontWeight fontWeight)
-        {
-            TextRange textRange = new TextRange(OutputRichTextBox.Document.ContentEnd, OutputRichTextBox.Document.ContentEnd)
-            {
-                Text = text + Environment.NewLine
-            };
-            textRange.ApplyPropertyValue(TextElement.ForegroundProperty, color);
-            textRange.ApplyPropertyValue(TextElement.FontSizeProperty, fontSize);
-            textRange.ApplyPropertyValue(TextElement.FontWeightProperty, fontWeight);
-        }
-
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.F && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
-            {
-                SearchPanel.Visibility = Visibility.Visible;
-                SearchTextBox.Focus(); // Focus the search box
-            }
-        }
-
-        // Search when pressing Enter in search box
-        private void SearchTextBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                SearchButton_Click(sender, e); // Trigger search
-            }
-        }
-
-        private void SearchButton_Click(object sender, RoutedEventArgs e)
-        {
-            string searchText = SearchTextBox.Text;
-
-            if (!string.IsNullOrEmpty(searchText))
-            {
-                // Clear previous highlights
-                ClearTextHighlights();
-
-                // Search and highlight matches
-                TextPointer pointer = OutputRichTextBox.Document.ContentStart;
-                while (pointer != null)
-                {
-                    // Find the text in the document
-                    TextRange searchRange = FindTextInRichTextBox(pointer, searchText);
-                    if (searchRange != null)
-                    {
-                        searchRange.ApplyPropertyValue(TextElement.BackgroundProperty, Brushes.Yellow); // Highlight in yellow
-                        pointer = searchRange.End; // Move to next match
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
-        private TextRange FindTextInRichTextBox(TextPointer startPointer, string searchText)
-        {
-            while (startPointer != null)
-            {
-                if (startPointer.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
-                {
-                    string textRun = startPointer.GetTextInRun(LogicalDirection.Forward);
-                    int index = textRun.IndexOf(searchText, StringComparison.OrdinalIgnoreCase);
-                    if (index != -1)
-                    {
-                        TextPointer start = startPointer.GetPositionAtOffset(index);
-                        TextPointer end = start.GetPositionAtOffset(searchText.Length);
-                        return new TextRange(start, end);
-                    }
-                }
-                startPointer = startPointer.GetNextContextPosition(LogicalDirection.Forward);
-            }
-            return null;
-        }
-
-        private void ClearTextHighlights()
-        {
-            TextRange documentRange = new TextRange(OutputRichTextBox.Document.ContentStart, OutputRichTextBox.Document.ContentEnd);
-            documentRange.ApplyPropertyValue(TextElement.BackgroundProperty, Brushes.Transparent); // Clear highlights
         }
 
         private void ExportToDocxButton_Click(object sender, RoutedEventArgs e)
         {
-
             if (pfSenseConfigParser == null)
             {
                 MessageBox.Show("Please select a file first.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            // Use the new ParseConfig method
-            Dictionary<string, List<string>> configData = pfSenseConfigParser.ParseConfig();
-
-            string filePath = $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_PfSenseConfigSummary.docx";
-
-            ConfigDocumentGenerator.GenerateDocument(systemConfig, ipSecVpnConfig, filePath);
 
             var docxPath = $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_SystemConfig.docx";
+
             using (WordprocessingDocument wordDoc = WordprocessingDocument.Create(docxPath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
             {
+
+                // Add a main document part
                 MainDocumentPart mainPart = wordDoc.AddMainDocumentPart();
                 mainPart.Document = new Document();
                 Body body = mainPart.Document.AppendChild(new Body());
 
+                // Add Title Page
+                DocumentHelper.AddTitlePage(body, $"Firewall Documentation for {textboxCustomerName.Text}");
+                DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+
+                // Add ToC
+                DocumentHelper.AddTableOfContents(body, mainPart);
+                DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+
+                // Add System Configuration
                 if (chkSystemConfig.IsChecked == true)
+                {
+                    DocumentHelper.AddHeading(body, "System Configuration", 1, mainPart);
                     ConfigDocumentGenerator.AddSystemConfigToDocument(systemConfig, body, mainPart);
-
-
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+                // Add IPSec VPN Configuration
                 if (chkIpSecVpnConfig.IsChecked == true)
+                {
+                    DocumentHelper.AddHeading(body, "IPSec VPN Configuration", 1, mainPart);
                     ConfigDocumentGenerator.AddIpSecVpnConfigToDocument(ipSecVpnConfig, body, mainPart);
-
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+                // Add Interfaces
                 if (chkInterfaces.IsChecked == true)
+                {
+                    DocumentHelper.AddHeading(body, "Interfaces", 1, mainPart);
                     ConfigDocumentGenerator.AddInterfaceConfigToDocument(interfaces, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+                // Add Static Routes
                 if (chkStaticRoutes.IsChecked == true)
-
+                {
+                    DocumentHelper.AddHeading(body, "Static Routes", 1, mainPart);
+                    ConfigDocumentGenerator.AddStaticRoutesToDocument(staticRoutes, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+                // Add DHCP Configuration
                 if (chkDHCPConfig.IsChecked == true)
-
+                {
+                    DocumentHelper.AddHeading(body, "DHCP Configuration", 1, mainPart);
+                    ConfigDocumentGenerator.AddDhcpConfigToDocument(dhcpConfig, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+                // Add Firewall Configuration
                 if (chkFirewallConfig.IsChecked == true)
-
+                {
+                    DocumentHelper.AddHeading(body, "Firewall Configuration", 1, mainPart);
+                    ConfigDocumentGenerator.AddFirewallConfigToDocument(firewallConfig, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+                // Add Certificates and CA
                 if (chkCertificatesAndCA.IsChecked == true)
-
+                {
+                    DocumentHelper.AddHeading(body, "Certificates and CA", 1, mainPart);
+                    ConfigDocumentGenerator.AddCertificatesAndCAToDocument(certificatesAndCA, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+                // Users
                 if (chkUsers.IsChecked == true)
-
+                {
+                    DocumentHelper.AddHeading(body, "Users", 1, mainPart);
+                    ConfigDocumentGenerator.AddUsersToDocument(users, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+                // Groups
                 if (chkGroups.IsChecked == true)
-
+                {
+                    DocumentHelper.AddHeading(body, "Groups", 1, mainPart);
+                    ConfigDocumentGenerator.AddGroupsToDocument(groups, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+                // Other Configurations
                 if (chkOtherConfigs.IsChecked == true)
-                
+                {
+                    DocumentHelper.AddHeading(body, "Other Configurations", 1, mainPart);
+                    ConfigDocumentGenerator.AddOtherConfigsToDocument(otherConfigs, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+
+                // Add Header and Footer
+                HeaderHelper.AddHeader(mainPart, $"Solvia - Firewall Documentation for {textboxCustomerName.Text}");
+                FooterHelper.AddFooter(mainPart, "Page ");
                 mainPart.Document.Save();
             }
-            OpenFile(filePath);
             OpenFile(docxPath);
-
         }
         private void OpenFile(string filePath)
         {

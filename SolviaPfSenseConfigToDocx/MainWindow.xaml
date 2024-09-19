@@ -1,7 +1,7 @@
 ﻿<Window x:Class="SolviaPfSenseConfigToDocx.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="PfSense Config Reader" Height="500" Width="600" KeyDown="Window_KeyDown">
+        Title="PfSense Config Reader" Height="500" Width="600">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -12,21 +12,15 @@
             <!-- For RichTextBox, using * to fill available space -->
         </Grid.RowDefinitions>
 
-        <!-- Label for Ctrl-F -->
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" FontSize="14" Foreground="Gray" Grid.Row="0">Ctrl-F to search</TextBlock>
-
         <!-- Select File Button -->
-        <Button Content="Select File" Width="150" Height="40" HorizontalAlignment="Center" VerticalAlignment="Top" Click="SelectFileButton_Click" Margin="0,40,0,0" Grid.Row="0"/>
-        <Button Content="Export to Docx" Width="150" Height="40" HorizontalAlignment="Center" VerticalAlignment="Top" Click="ExportToDocxButton_Click" Margin="0,90,0,0" Grid.Row="0"/>
-
-        <!-- Search Panel -->
-        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal" Margin="10,80,10,0" Visibility="Collapsed" Name="SearchPanel" Grid.Row="0">
-            <TextBox Name="SearchTextBox" Width="200" Height="25" VerticalAlignment="Center" Margin="0,0,10,0" KeyDown="SearchTextBox_KeyDown"/>
-            <Button Content="Search" Width="80" Click="SearchButton_Click"/>
+        <Button Content="Select config.xml" Width="150" Height="30" HorizontalAlignment="Center" VerticalAlignment="Top" Click="SelectFileButton_Click" Margin="0,40,0,0" Grid.Row="0"/>
+        <Button Content="Export to Docx" Width="150" Height="30" HorizontalAlignment="Center" VerticalAlignment="Top" Click="ExportToDocxButton_Click" Margin="0,90,0,0" Grid.Row="0"/>
+        <StackPanel Grid.Row="1">
+            <Label x:Name="lblCustomerName" Content="Customer Name:" HorizontalAlignment="Left"/>
+            <TextBox x:Name="textboxCustomerName" Text="Solvia GmbH, 8127 Forch, Switzerland"></TextBox>
         </StackPanel>
-
         <!-- Checkboxes for configurations -->
-        <StackPanel Orientation="Vertical" Grid.Row="1" Margin="10">
+        <StackPanel Orientation="Vertical" Grid.Row="2" Margin="10">
             <CheckBox Content="SystemConfig" x:Name="chkSystemConfig" IsChecked="true"/>
             <CheckBox Content="IpSecVPNConfig" x:Name="chkIpSecVpnConfig" IsChecked="True"/>
             <CheckBox Content="Interfaces" x:Name="chkInterfaces" IsChecked="true"/>
@@ -38,8 +32,5 @@
             <CheckBox Content="Groups" x:Name="chkGroups" IsChecked="true"/>
             <CheckBox Content="Other Configurations" x:Name="chkOtherConfigs" IsChecked="true"/>
         </StackPanel>
-
-        <!-- RichTextBox for output -->
-        <RichTextBox Name="OutputRichTextBox" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="2"/>
     </Grid>
 </Window>

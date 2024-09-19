@@ -75,8 +75,6 @@ namespace SolviaPfSenseConfigToDocx.DocumentGenerators
             DocumentHelper.AddParagraph(body, $"AC Mode: {systemConfig.PowerSettings.PowerdAcMode}");
             DocumentHelper.AddParagraph(body, $"Battery Mode: {systemConfig.PowerSettings.PowerdBatteryMode}");
             DocumentHelper.AddParagraph(body, $"Normal Mode: {systemConfig.PowerSettings.PowerdNormalMode}");
-
-            // Add other necessary system config details similarly
         }
 
         public static void AddIpSecVpnConfigToDocument(IpSecVPNConfig vpnConfig, Body body, MainDocumentPart mainPart)
@@ -108,6 +106,41 @@ namespace SolviaPfSenseConfigToDocx.DocumentGenerators
                     DocumentHelper.AddParagraph(body, $"Algorithm: {option.Name}, Key Length: {option.KeyLength}");
                 }
             }
+        }
+
+        internal static void AddStaticRoutesToDocument(List<StaticRoute> staticRoutes, Body body, MainDocumentPart mainPart)
+        {
+            DocumentHelper.AddTableFromObject(body, staticRoutes);
+        }
+
+        internal static void AddDhcpConfigToDocument(DHCPConfig dhcpConfig, Body body, MainDocumentPart mainPart)
+        {
+            DocumentHelper.AddTableFromObject(body, dhcpConfig);
+        }
+
+        internal static void AddFirewallConfigToDocument(FirewallConfig firewallConfig, Body body, MainDocumentPart mainPart)
+        {
+            DocumentHelper.AddTableFromObject(body, firewallConfig);
+        }
+
+        internal static void AddCertificatesAndCAToDocument(CertificateConfig certificatesAndCA, Body body, MainDocumentPart mainPart)
+        {
+            DocumentHelper.AddTableFromObject(body, certificatesAndCA);
+        }
+
+        internal static void AddUsersToDocument(List<User> users, Body body, MainDocumentPart mainPart)
+        {
+            DocumentHelper.AddTableFromObject(body, users);
+        }
+
+        internal static void AddGroupsToDocument(List<Group> groups, Body body, MainDocumentPart mainPart)
+        {
+            DocumentHelper.AddTableFromObject(body, groups);
+        }
+
+        internal static void AddOtherConfigsToDocument(OtherConfigurations otherConfigs, Body body, MainDocumentPart mainPart)
+        {
+            DocumentHelper.AddTableFromObject(body, otherConfigs);
         }
     }
 }
