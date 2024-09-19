@@ -1,5 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using Microsoft.Win32;
+using SolviaPfSenseConfigToDocx.DataModels;
+using SolviaPfSenseConfigToDocx.DocumentGenerators;
 using SolviaPfSenseConfigToDocx.Parsers;
 using System.Windows;
 using System.Windows.Documents;
@@ -12,6 +14,9 @@ namespace SolviaPfSenseConfigToDocx
     public partial class MainWindow : Window
     {
         private PfSenseConfigParser pfSenseConfigParser;
+        private SystemConfig systemConfig;
+        private IpSecVPNConfig ipSecVpnConfig;
+
 
         public MainWindow()
         {
@@ -31,15 +36,15 @@ namespace SolviaPfSenseConfigToDocx
                 
                 // Parse each section
 
-                var systemConfig = pfSenseConfigParser.ParseSystemConfig();
+                systemConfig = pfSenseConfigParser.ParseSystemConfig();
                 var users = pfSenseConfigParser.ParseUsers();
                 var groups = pfSenseConfigParser.ParseGroups();
                 var interfaces = pfSenseConfigParser.ParseInterfaces();
+                var staticRoutes = pfSenseConfigParser.ParseStaticRoutes();
                 var dhcpConfig = pfSenseConfigParser.ParseDHCPConfig();
                 var firewallConfig = pfSenseConfigParser.ParseFirewallRulesAndNAT();
-                var vpnConfig = pfSenseConfigParser.ParseVPNConfig();
+                ipSecVpnConfig = pfSenseConfigParser.ParseIpSecVPNConfig();
                 var certificatesAndCA = pfSenseConfigParser.ParseCertificatesAndCA();
-                var staticRoutes = pfSenseConfigParser.ParseStaticRoutes();
                 var otherConfigs = pfSenseConfigParser.ParseOtherConfigurations();
 
                 OutputRichTextBox.Document.Blocks.Clear(); // Clear previous content
@@ -153,6 +158,8 @@ namespace SolviaPfSenseConfigToDocx
 
             string filePath = "PfSenseConfigSummary.docx";
 
+            ConfigDocumentGenerator.GenerateDocument(systemConfig, ipSecVpnConfig, filePath);
+
             using (WordprocessingDocument wordDocument = WordprocessingDocument.Create(filePath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
             {
                 // Add a main document part.
@@ -180,15 +187,11 @@ namespace SolviaPfSenseConfigToDocx
                         body.Append(entryParagraph);
                     }
                 }
-
                 // Save the changes to the document
                 mainPart.Document.Append(body);
                 mainPart.Document.Save();
             }
-
             MessageBox.Show($"Document saved as {filePath}", "Export Completed", MessageBoxButton.OK, MessageBoxImage.Information);
         }
-
-
     }
 }

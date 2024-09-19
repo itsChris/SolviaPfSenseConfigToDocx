@@ -10,7 +10,7 @@
         // Properties from the Certificates/CA context
         public string RefID { get; set; }       // Reference ID for general certificates
         public string Type { get; set; }        // Certificate type (e.g., server, user)
-        public string PRV { get; set; }         // Private key (PRV)
+        public string PrivateKey { get; set; }         // Private key (PRV)
         public string CARef { get; set; }       // Reference to the Certificate Authority (CA) if applicable
     }
 }

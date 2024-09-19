@@ -13,8 +13,10 @@ namespace SolviaPfSenseConfigToDocx.Factory
 
         public T ParseSection<T>(string sectionName, IParser<T> parser)
         {
-            var element = _xmlDocument.Root.Element(sectionName);
+            // If sectionName is empty, return the root element for parsing (e.g., for cert and ca)
+            var element = string.IsNullOrEmpty(sectionName) ? _xmlDocument.Root : _xmlDocument.Root.Element(sectionName);
             return element != null ? parser.Parse(element) : default;
         }
+
     }
 }

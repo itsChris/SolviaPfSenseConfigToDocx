@@ -9,5 +9,7 @@
         public string IPAddr { get; set; }
         public string Subnet { get; set; }
         public string Gateway { get; set; }
+        public string BlockPriv { get; set; }
+        public string BlockBogons { get; set; }
     }
 }

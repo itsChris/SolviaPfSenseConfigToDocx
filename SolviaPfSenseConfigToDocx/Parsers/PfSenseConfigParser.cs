@@ -48,16 +48,16 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             return _parserFactory.ParseSection("filter", firewallRulesAndNATParser);
         }
 
-        public VPNConfig ParseVPNConfig()
+        public IpSecVPNConfig ParseIpSecVPNConfig()
         {
-            var vpnConfigParser = new VPNConfigParser();
-            return _parserFactory.ParseSection("config", vpnConfigParser);  // 'config' is the root element that contains 'ipsec' and 'openvpn'
+            var ipSecVpnConfigParser = new IpSecVPNConfigParser();
+            return _parserFactory.ParseSection("ipsec", ipSecVpnConfigParser);  // 'config' is the root element that contains 'ipsec' and 'openvpn'
         }
 
         public CertificateConfig ParseCertificatesAndCA()
         {
             var certificatesAndCAParser = new CertificatesAndCAParser();
-            return _parserFactory.ParseSection("certificates", certificatesAndCAParser);
+            return _parserFactory.ParseSection("", certificatesAndCAParser); // Passing the root element
         }
 
         public List<StaticRoute> ParseStaticRoutes()
@@ -79,12 +79,12 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             // Parse SystemConfig
             var systemConfig = ParseSystemConfig();
             parsedData["SystemConfig"] = new List<string>
-    {
-        $"Hostname: {systemConfig.Hostname}",
-        $"Domain: {systemConfig.Domain}",
-        $"NextUID: {systemConfig.NextUID}",
-        $"NextGID: {systemConfig.NextGID}"
-    };
+                {
+                    $"Hostname: {systemConfig.Hostname}",
+                    $"Domain: {systemConfig.Domain}",
+                    $"NextUID: {systemConfig.NextUID}",
+                    $"NextGID: {systemConfig.NextGID}"
+                };
 
             // Parse Users
             var users = ParseUsers();
@@ -116,10 +116,10 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             // Parse DHCP Config
             var dhcpConfig = ParseDHCPConfig();
             parsedData["DHCP"] = new List<string>
-    {
-        $"DHCPv4 Range: {dhcpConfig.DHCPv4?.Range.From} - {dhcpConfig.DHCPv4?.Range.To}",
-        $"DHCPv6 Range: {dhcpConfig.DHCPv6?.Range.From} - {dhcpConfig.DHCPv6?.Range.To}"
-    };
+                    {
+                        $"DHCPv4 Range: {dhcpConfig.DHCPv4?.Range.From} - {dhcpConfig.DHCPv4?.Range.To}",
+                        $"DHCPv6 Range: {dhcpConfig.DHCPv6?.Range.From} - {dhcpConfig.DHCPv6?.Range.To}"
+                    };
 
             // Parse Firewall Rules and NAT
             var firewallConfig = ParseFirewallRulesAndNAT();
@@ -131,7 +131,7 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             parsedData["FirewallRules"] = firewallData;
 
             // Parse VPN Config
-            var vpnConfig = ParseVPNConfig();
+            var vpnConfig = ParseIpSecVPNConfig();
             var vpnData = new List<string>();
 
             // TODO: Add more details if needed

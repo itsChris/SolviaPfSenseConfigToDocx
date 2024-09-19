@@ -19,7 +19,9 @@ namespace SolviaPfSenseConfigToDocx.Parsers
                     Description = ifaceElement.Element("descr")?.Value,
                     IPAddr = ifaceElement.Element("ipaddr")?.Value,
                     Subnet = ifaceElement.Element("subnet")?.Value,
-                    Gateway = ifaceElement.Element("gateway")?.Value
+                    Gateway = ifaceElement.Element("gateway")?.Value,
+                    BlockBogons = ifaceElement.Element("blockbogons")?.Value,
+                    BlockPriv = ifaceElement.Element("blockprivate")?.Value,
                 };
                 interfaces.Add(iface);
             }
