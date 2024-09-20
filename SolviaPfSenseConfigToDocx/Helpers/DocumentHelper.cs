@@ -1,6 +1,8 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml;
+using SolviaPfSenseConfigToDocx.CustomAttributes;
+using System.Reflection;
 
 namespace SolviaPfSenseConfigToDocx.Helpers
 {
@@ -36,7 +38,7 @@ namespace SolviaPfSenseConfigToDocx.Helpers
             Run runTOC = new Run();
             FieldChar begin = new FieldChar() { FieldCharType = FieldCharValues.Begin };
             FieldCode fieldCode = new FieldCode() { Space = SpaceProcessingModeValues.Preserve };
-            fieldCode.Text = " TOC \\o \"1-3\" \\h \\z \\u ";  // TOC field options for levels 1-3, hyperlinks, etc.
+            fieldCode.Text = " TOC \\o \"1-2\" \\h \\z \\u ";  // TOC field options for levels 1-2, hyperlinks, etc.
             FieldChar separate = new FieldChar() { FieldCharType = FieldCharValues.Separate };
             FieldChar end = new FieldChar() { FieldCharType = FieldCharValues.End };
 
@@ -258,6 +260,13 @@ namespace SolviaPfSenseConfigToDocx.Helpers
                 }
                 else if (IsPrimitiveType(property.PropertyType))
                 {
+                    // check if the property has been annotated with the [Exclude] attribute
+                    var excludeAttr = property.GetCustomAttribute<ExcludeAttribute>();
+                    if (excludeAttr != null && excludeAttr.Exclude)
+                    {
+                        // Skip this property
+                        continue;
+                    }
                     // Get the property value (Value)
                     var propertyValue = property.GetValue(obj)?.ToString() ?? "N/A";  // Handle null values
 
@@ -285,6 +294,7 @@ namespace SolviaPfSenseConfigToDocx.Helpers
 
             // Append the table to the body
             body.Append(table);
+            body.Append(new Paragraph());
         }
 
         private static bool IsPrimitiveType(Type type)
