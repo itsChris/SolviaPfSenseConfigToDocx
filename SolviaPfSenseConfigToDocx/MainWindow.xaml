@@ -30,6 +30,12 @@
             <CheckBox Content="Certificates and CA" x:Name="chkCertificatesAndCA" IsChecked="true"/>
             <CheckBox Content="Users" x:Name="chkUsers" IsChecked="true"/>
             <CheckBox Content="Groups" x:Name="chkGroups" IsChecked="true"/>
+            <CheckBox Content="Packages" x:Name="chkPackages" IsChecked="true"/>
+            <CheckBox Content="Services" x:Name="chkServices" IsChecked="true"/>
+            <CheckBox Content="VirtualIps" x:Name="chkVirtualIps" IsChecked="True" />
+            <CheckBox Content="Gateways" x:Name="chkGateways" IsChecked="true"/>
+            <CheckBox Content="Aliases" x:Name="chkAliases" IsChecked="True"/>
+            <CheckBox Content="Cronjobs" x:Name="chkCronJobs" IsChecked="True" />
             <CheckBox Content="Other Configurations" x:Name="chkOtherConfigs" IsChecked="true"/>
         </StackPanel>
     </Grid>

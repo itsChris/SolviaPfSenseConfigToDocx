@@ -1,6 +1,5 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
 using SolviaPfSenseConfigToDocx.Factory;
-using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace SolviaPfSenseConfigToDocx.Parsers
@@ -20,12 +19,12 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             {
                 var cert = new Certificate
                 {
-                    RefID = certElement.Element("refid")?.Value,
-                    Description = certElement.Element("descr")?.Value,
-                    Type = certElement.Element("type")?.Value,
-                    Cert = certElement.Element("crt")?.Value,
-                    PrivateKey = certElement.Element("prv")?.Value,
-                    CARef = certElement.Element("caref")?.Value
+                    RefID = certElement.Element("refid")?.Value ?? string.Empty,
+                    Description = certElement.Element("descr")?.Value ?? string.Empty,
+                    Type = certElement.Element("type")?.Value ?? string.Empty,
+                    Cert = certElement.Element("crt")?.Value ?? string.Empty,
+                    PrivateKey = certElement.Element("prv")?.Value ?? string.Empty,
+                    CARef = certElement.Element("caref")?.Value ?? string.Empty
                 };
 
                 certificateConfig.Certificates.Add(cert);
@@ -36,11 +35,11 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             {
                 var ca = new CertificateAuthority
                 {
-                    RefID = caElement.Element("refid")?.Value,
-                    Description = caElement.Element("descr")?.Value,
-                    Trust = caElement.Element("trust")?.Value,
-                    Cert = caElement.Element("crt")?.Value,
-                    PrivateKey = caElement.Element("prv")?.Value
+                    RefID = caElement.Element("refid")?.Value ?? string.Empty,
+                    Description = caElement.Element("descr")?.Value ?? string.Empty,
+                    Trust = caElement.Element("trust")?.Value ?? string.Empty,
+                    Cert = caElement.Element("crt")?.Value ?? string.Empty,
+                    PrivateKey = caElement.Element("prv")?.Value ?? string.Empty
                 };
 
                 certificateConfig.CertificateAuthorities.Add(ca);

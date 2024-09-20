@@ -14,14 +14,15 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             {
                 var iface = new Interface
                 {
-                    If = ifaceElement.Element("if")?.Value,
+                    If = ifaceElement.Element("if")?.Value ?? string.Empty,
                     Enable = ifaceElement.Element("enable") != null,
-                    Description = ifaceElement.Element("descr")?.Value,
-                    IPAddr = ifaceElement.Element("ipaddr")?.Value,
-                    Subnet = ifaceElement.Element("subnet")?.Value,
-                    Gateway = ifaceElement.Element("gateway")?.Value,
-                    BlockBogons = ifaceElement.Element("blockbogons")?.Value,
-                    BlockPriv = ifaceElement.Element("blockprivate")?.Value,
+                    Description = ifaceElement.Element("descr")?.Value ?? string.Empty,
+                    IPAddr = ifaceElement.Element("ipaddr")?.Value ?? string.Empty,
+                    Subnet = ifaceElement.Element("subnet")?.Value ?? string.Empty,
+                    Gateway = ifaceElement.Element("gateway")?.Value ?? string.Empty,
+                    BlockBogons = ifaceElement.Element("blockbogons")?.Value ?? string.Empty,
+                    BlockPriv = ifaceElement.Element("blockprivate")?.Value ?? string.Empty,
+                    SpoofMAC = ifaceElement.Element("spoofmac")?.Value ?? string.Empty
                 };
                 interfaces.Add(iface);
             }

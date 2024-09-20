@@ -12,10 +12,28 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             _parserFactory = new ParserFactory(xmlFilePath);
         }
 
+        internal List<Alias> ParseAliases()
+        {
+            var aliasParser = new AliasParser();
+            return _parserFactory.ParseSection("aliases", aliasParser);
+        }
+
         public SystemConfig ParseSystemConfig()
         {
             var systemConfigParser = new SystemConfigParser();
             return _parserFactory.ParseSection("system", systemConfigParser);
+        }
+
+        public List<CronJob> ParseCronJobs()
+        {
+            var cronJobParser = new CronJobParser();
+            return _parserFactory.ParseSection("cron", cronJobParser);
+        }
+
+        public PfSense PfSense() 
+        {
+            var pfSenseParser = new PfSenseVersionParser();
+            return _parserFactory.ParseSection("", pfSenseParser);
         }
 
         public List<User> ParseUsers()
@@ -36,6 +54,12 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             return _parserFactory.ParseSection("interfaces", interfacesParser);
         }
 
+        internal List<Gateway> ParseGateways()
+        {
+            var gatewayParser = new GatewayParser();
+            return _parserFactory.ParseSection("gateways", gatewayParser);
+        }
+
         public DHCPConfig ParseDHCPConfig()
         {
             var dhcpConfigParser = new DHCPConfigParser();
@@ -51,13 +75,13 @@ namespace SolviaPfSenseConfigToDocx.Parsers
         public IpSecVPNConfig ParseIpSecVPNConfig()
         {
             var ipSecVpnConfigParser = new IpSecVPNConfigParser();
-            return _parserFactory.ParseSection("ipsec", ipSecVpnConfigParser);  // 'config' is the root element that contains 'ipsec' and 'openvpn'
+            return _parserFactory.ParseSection("ipsec", ipSecVpnConfigParser);  
         }
 
         public CertificateConfig ParseCertificatesAndCA()
         {
             var certificatesAndCAParser = new CertificatesAndCAParser();
-            return _parserFactory.ParseSection("", certificatesAndCAParser); // Passing the root element
+            return _parserFactory.ParseSection("", certificatesAndCAParser); 
         }
 
         public List<StaticRoute> ParseStaticRoutes()
@@ -66,124 +90,34 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             return _parserFactory.ParseSection("staticroutes", staticRoutesParser);
         }
 
+        internal List<Package> ParsePackages()
+        {
+            var packageParser = new PackageParser();
+            return _parserFactory.ParseSection("installedpackages", packageParser);
+        }
+
+        internal List<Service> ParseServices()
+        {
+            var serviceParser = new ServiceParser();
+            return _parserFactory.ParseSection("installedpackages", serviceParser);
+        }
+
+        internal List<VirtualIP> ParseVirtualIPs()
+        {
+            var virtualIPParser = new VirtualIPParser();
+            return _parserFactory.ParseSection("virtualip", virtualIPParser);
+        }
+
         public OtherConfigurations ParseOtherConfigurations()
         {
             var otherConfigurationParser = new OtherConfigurationParser();
-            return _parserFactory.ParseSection("config", otherConfigurationParser);
+            return _parserFactory.ParseSection("", otherConfigurationParser); // passing the root element
         }
 
-        public Dictionary<string, List<string>> ParseConfig()
+        internal List<IpSecConnection> ParseIpSecConnections()
         {
-            var parsedData = new Dictionary<string, List<string>>();
-
-            // Parse SystemConfig
-            var systemConfig = ParseSystemConfig();
-            parsedData["SystemConfig"] = new List<string>
-                {
-                    $"Hostname: {systemConfig.Hostname}",
-                    $"Domain: {systemConfig.Domain}",
-                    $"NextUID: {systemConfig.NextUID}",
-                    $"NextGID: {systemConfig.NextGID}"
-                };
-
-            // Parse Users
-            var users = ParseUsers();
-            var userData = new List<string>();
-            foreach (var user in users)
-            {
-                userData.Add($"User: {user.Name}, UID: {user.UID}");
-            }
-            parsedData["Users"] = userData;
-
-            // Parse Groups
-            var groups = ParseGroups();
-            var groupData = new List<string>();
-            foreach (var group in groups)
-            {
-                groupData.Add($"Group: {group.Name}, GID: {group.GID}");
-            }
-            parsedData["Groups"] = groupData;
-
-            // Parse Interfaces
-            var interfaces = ParseInterfaces();
-            var interfacesData = new List<string>();
-            foreach (var iface in interfaces)
-            {
-                interfacesData.Add($"Interface: {iface.If}, IP: {iface.IPAddr}, Description: {iface.Description}");
-            }
-            parsedData["Interfaces"] = interfacesData;
-
-            // Parse DHCP Config
-            var dhcpConfig = ParseDHCPConfig();
-            parsedData["DHCP"] = new List<string>
-                    {
-                        $"DHCPv4 Range: {dhcpConfig.DHCPv4?.Range.From} - {dhcpConfig.DHCPv4?.Range.To}",
-                        $"DHCPv6 Range: {dhcpConfig.DHCPv6?.Range.From} - {dhcpConfig.DHCPv6?.Range.To}"
-                    };
-
-            // Parse Firewall Rules and NAT
-            var firewallConfig = ParseFirewallRulesAndNAT();
-            var firewallData = new List<string>();
-            foreach (var rule in firewallConfig.FirewallRules)
-            {
-                firewallData.Add($"Rule: {rule.Description}, Protocol: {rule.Protocol}");
-            }
-            parsedData["FirewallRules"] = firewallData;
-
-            // Parse VPN Config
-            var vpnConfig = ParseIpSecVPNConfig();
-            var vpnData = new List<string>();
-
-            // TODO: Add more details if needed
-            if (vpnConfig != null)
-            {
-                foreach (var ipsec in vpnConfig.IPsecPhase1Configs)
-                {
-                    vpnData.Add($"IPSec Remote Gateway: {ipsec.RemoteGateway}");
-                }
-                parsedData["VPNConfigurations"] = vpnData;
-            }
-
-            // Parse Certificates and CA
-            var certificatesAndCA = ParseCertificatesAndCA();
-            var certData = new List<string>();
-
-            // TODO: Add more details if needed
-            if (certificatesAndCA != null)
-            {
-                foreach (var cert in certificatesAndCA.Certificates)
-                {
-                    certData.Add($"Certificate: {cert.Description}, RefID: {cert.RefID}");
-                }
-                parsedData["Certificates"] = certData;
-            }
-
-            // Parse Static Routes
-            var staticRoutes = ParseStaticRoutes();
-            var routeData = new List<string>();
-            foreach (var route in staticRoutes)
-            {
-                routeData.Add($"Route: {route.Destination} -> {route.Gateway}");
-            }
-            parsedData["StaticRoutes"] = routeData;
-
-            // Parse Other Configurations
-            var otherConfigs = ParseOtherConfigurations();
-            var aliasData = new List<string>();
-
-            // TODO: Add more details if needed
-
-            if(otherConfigs != null)
-            {
-                foreach (var alias in otherConfigs.Aliases)
-                {
-                    aliasData.Add($"Alias: {alias.AliasName}");
-                }
-                parsedData["OtherConfigurations"] = aliasData;
-
-            }
-
-            return parsedData;
+            var ipSecConnectionParser = new IpSecConnectionParser();
+            return _parserFactory.ParseSection("ipsec", ipSecConnectionParser);
         }
     }
 }

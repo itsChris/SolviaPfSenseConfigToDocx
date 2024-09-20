@@ -11,7 +11,7 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             var otherConfigurations = new OtherConfigurations();
 
             // Parse Aliases
-            foreach (var aliasElement in rootElement.Element("aliases")?.Elements("alias") ?? Enumerable.Empty<XElement>())
+            foreach (var aliasElement in rootElement.Elements("aliases"))
             {
                 var alias = new Alias
                 {
@@ -25,7 +25,7 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             }
 
             // Parse SNMP
-            var snmpElement = rootElement.Element("snmp");
+            var snmpElement = rootElement.Element("snmpd");
             if (snmpElement != null)
             {
                 otherConfigurations.SNMP = new SNMPConfig
@@ -37,7 +37,7 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             }
 
             // Parse Gateways
-            foreach (var gatewayElement in rootElement.Element("gateways")?.Elements("gateway") ?? Enumerable.Empty<XElement>())
+            foreach (var gatewayElement in rootElement.Elements("gateways"))
             {
                 var gateway = new Gateway
                 {
@@ -93,7 +93,7 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             }
 
             // Parse Cron Jobs
-            foreach (var cronElement in rootElement.Element("cron")?.Elements("job") ?? Enumerable.Empty<XElement>())
+            foreach (var cronElement in rootElement.Elements("cron"))
             {
                 var cronJob = new CronJob
                 {
@@ -105,7 +105,7 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             }
 
             // Parse Packages
-            foreach (var packageElement in rootElement.Element("installedpackages")?.Elements("package") ?? Enumerable.Empty<XElement>())
+            foreach (var packageElement in rootElement.Elements("installedpackages"))
             {
                 var package = new Package
                 {
@@ -122,13 +122,13 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             }
 
             // Parse Virtual IPs
-            foreach (var vipElement in rootElement.Element("virtualip")?.Elements("vip") ?? Enumerable.Empty<XElement>())
+            foreach (var vipElement in rootElement.Elements("virtualip"))
             {
                 var virtualIP = new VirtualIP
                 {
                     Mode = vipElement.Element("mode")?.Value,
                     Interface = vipElement.Element("interface")?.Value,
-                    Address = vipElement.Element("subnet")?.Value,
+                    Subnet = vipElement.Element("subnet")?.Value,
                     Description = vipElement.Element("descr")?.Value
                 };
                 otherConfigurations.VirtualIPs.Add(virtualIP);

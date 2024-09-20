@@ -14,8 +14,9 @@ namespace SolviaPfSenseConfigToDocx
     public partial class MainWindow : Window
     {
         private PfSenseConfigParser pfSenseConfigParser;
+
+        private PfSense pfSense;
         private SystemConfig systemConfig;
-        private IpSecVPNConfig ipSecVpnConfig;
         private List<Interface> interfaces;
         private List<StaticRoute> staticRoutes;
         private DHCPConfig dhcpConfig;
@@ -23,6 +24,13 @@ namespace SolviaPfSenseConfigToDocx
         private CertificateConfig certificatesAndCA;
         private List<User> users;
         private List<Group> groups;
+        private List<CronJob> cronJobs;
+        private List<Gateway> gateways;
+        private List<Alias> aliases;
+        private List<VirtualIP> virtualIPs;
+        private List<Package> packages;
+        private List<Service> services;
+        private List<IpSecConnection> ipSecConnections;
         private OtherConfigurations otherConfigs;
 
         public MainWindow()
@@ -41,9 +49,9 @@ namespace SolviaPfSenseConfigToDocx
             if (openFileDialog.ShowDialog() == true)
             {
                 pfSenseConfigParser = new PfSenseConfigParser(openFileDialog.FileName);
-                
-                // Parse each section
 
+                // Parse each section
+                pfSense = pfSenseConfigParser.PfSense();
                 systemConfig = pfSenseConfigParser.ParseSystemConfig();
                 users = pfSenseConfigParser.ParseUsers();
                 groups = pfSenseConfigParser.ParseGroups();
@@ -51,8 +59,14 @@ namespace SolviaPfSenseConfigToDocx
                 staticRoutes = pfSenseConfigParser.ParseStaticRoutes();
                 dhcpConfig = pfSenseConfigParser.ParseDHCPConfig();
                 firewallConfig = pfSenseConfigParser.ParseFirewallRulesAndNAT();
-                ipSecVpnConfig = pfSenseConfigParser.ParseIpSecVPNConfig();
                 certificatesAndCA = pfSenseConfigParser.ParseCertificatesAndCA();
+                cronJobs = pfSenseConfigParser.ParseCronJobs();
+                gateways = pfSenseConfigParser.ParseGateways();
+                aliases = pfSenseConfigParser.ParseAliases();
+                virtualIPs = pfSenseConfigParser.ParseVirtualIPs();
+                packages = pfSenseConfigParser.ParsePackages();
+                services = pfSenseConfigParser.ParseServices();
+                ipSecConnections = pfSenseConfigParser.ParseIpSecConnections();
                 otherConfigs = pfSenseConfigParser.ParseOtherConfigurations();
             }
         }
@@ -94,7 +108,7 @@ namespace SolviaPfSenseConfigToDocx
                 if (chkIpSecVpnConfig.IsChecked == true)
                 {
                     DocumentHelper.AddHeading(body, "IPSec VPN Configuration", 1, mainPart);
-                    ConfigDocumentGenerator.AddIpSecVpnConfigToDocument(ipSecVpnConfig, body, mainPart);
+                    ConfigDocumentGenerator.AddIpSecVpnConfigToDocument(ipSecConnections, body, mainPart);
                     DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
                 }
                 // Add Interfaces
@@ -144,6 +158,52 @@ namespace SolviaPfSenseConfigToDocx
                 {
                     DocumentHelper.AddHeading(body, "Groups", 1, mainPart);
                     ConfigDocumentGenerator.AddGroupsToDocument(groups, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+
+                // Packages
+                if (chkPackages.IsChecked == true)
+                {
+                    DocumentHelper.AddHeading(body, "Packages", 1, mainPart);
+                    ConfigDocumentGenerator.AddPackagesToDocument(packages, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+
+                // Services
+                if (chkServices.IsChecked == true)
+                {
+                    DocumentHelper.AddHeading(body, "Services", 1, mainPart);
+                    ConfigDocumentGenerator.AddServicesToDocument(services, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+                // Virtual IPs
+                if (chkVirtualIps.IsChecked == true)
+                {
+                    DocumentHelper.AddHeading(body, "Virtual IPs", 1, mainPart);
+                    ConfigDocumentGenerator.AddVirtualIPsToDocument(virtualIPs, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+                // Gateways
+                if (chkGateways.IsChecked == true)
+                {
+                    DocumentHelper.AddHeading(body, "Gateways", 1, mainPart);
+                    ConfigDocumentGenerator.AddGatewaysToDocument(gateways, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+
+                // Aliases
+                if (chkAliases.IsChecked == true)
+                {
+                    DocumentHelper.AddHeading(body, "Aliases", 1, mainPart);
+                    ConfigDocumentGenerator.AddAliasesToDocument(aliases, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+
+                // Cron Jobs
+                if (chkCronJobs.IsChecked == true)
+                {
+                    DocumentHelper.AddHeading(body, "Cron Jobs", 1, mainPart);
+                    ConfigDocumentGenerator.AddCronJobsToDocument(cronJobs, body, mainPart);
                     DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
                 }
                 // Other Configurations

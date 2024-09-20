@@ -1,31 +1,31 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 
-namespace SolviaPfSenseConfigToDocx.Helpers
+public static class HeaderHelper
 {
-    public static class HeaderHelper
+    public static SectionProperties AddHeader(MainDocumentPart mainPart, string headerText)
     {
-        public static void AddHeader(MainDocumentPart mainPart, string headerText)
-        {
-            HeaderPart headerPart = mainPart.AddNewPart<HeaderPart>();
-            Header header = new Header();
-            Paragraph headerParagraph = new Paragraph(new ParagraphProperties(new Justification() { Val = JustificationValues.Center }));
-            Run headerRun = new Run();
-            headerRun.Append(new Text(headerText));
-            headerParagraph.Append(headerRun);
-            header.Append(headerParagraph);
-            headerPart.Header = header;
+        // Add new header part to the document
+        HeaderPart headerPart = mainPart.AddNewPart<HeaderPart>();
+        Header header = new Header();
 
-            // Retrieve or create the SectionProperties
-            SectionProperties sectionProperties = mainPart.Document.Body.Elements<SectionProperties>().FirstOrDefault() ?? new SectionProperties();
-            HeaderReference headerReference = new HeaderReference() { Type = HeaderFooterValues.Default, Id = mainPart.GetIdOfPart(headerPart) };
-            sectionProperties.Append(headerReference);
+        // Create a centered paragraph for the header text
+        Paragraph headerParagraph = new Paragraph(new ParagraphProperties(new Justification() { Val = JustificationValues.Center }));
+        Run headerRun = new Run(new Text(headerText));
+        headerParagraph.Append(headerRun);
+        header.Append(headerParagraph);
+        headerPart.Header = header;
 
-            // If the section properties are new, append them to the body
-            if (!mainPart.Document.Body.Elements<SectionProperties>().Any())
-            {
-                mainPart.Document.Body.Append(sectionProperties);
-            }
-        }
+        // Create the section properties and assign the header reference
+        SectionProperties sectionProperties = new SectionProperties();
+
+        // Reference for the header part
+        HeaderReference headerReference = new HeaderReference() { Type = HeaderFooterValues.Default, Id = mainPart.GetIdOfPart(headerPart) };
+        sectionProperties.Append(headerReference);
+
+        // Ensure different first page settings
+        sectionProperties.AppendChild(new TitlePage());
+
+        return sectionProperties;
     }
 }
