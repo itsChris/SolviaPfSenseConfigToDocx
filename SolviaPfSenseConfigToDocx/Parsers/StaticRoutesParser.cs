@@ -1,4 +1,5 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
+using SolviaPfSenseConfigToDocx.ExtensionMethods;
 using SolviaPfSenseConfigToDocx.Factory;
 using System.Xml.Linq;
 
@@ -8,6 +9,8 @@ namespace SolviaPfSenseConfigToDocx.Parsers
     {
         public List<StaticRoute> Parse(XElement staticRoutesElement)
         {
+            HtmlDecodeTextOnly(staticRoutesElement);
+
             var staticRoutes = new List<StaticRoute>();
 
             foreach (var routeElement in staticRoutesElement.Elements("route"))
@@ -25,6 +28,11 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             }
 
             return staticRoutes;
+        }
+
+        public void HtmlDecodeTextOnly(XElement element)
+        {
+            element.HtmlDecodeTextOnly();
         }
     }
 

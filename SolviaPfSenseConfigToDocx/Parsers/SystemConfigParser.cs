@@ -1,4 +1,5 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
+using SolviaPfSenseConfigToDocx.ExtensionMethods;
 using SolviaPfSenseConfigToDocx.Factory;
 using System.Xml.Linq;
 
@@ -8,12 +9,16 @@ namespace SolviaPfSenseConfigToDocx.Parsers
     {
         public SystemConfig Parse(XElement systemElement)
         {
+            HtmlDecodeTextOnly(systemElement);
+
             var systemConfig = new SystemConfig
             {
+                AllreadyRunConfigUpgrade = systemElement.Element("already_run_config_upgrade").Value ?? string.Empty,
                 Hostname = systemElement.Element("hostname")?.Value ?? string.Empty,
                 Domain = systemElement.Element("domain")?.Value ?? string.Empty,
                 NextUID = TryParseInt(systemElement.Element("nextuid")?.Value ?? string.Empty),
                 NextGID = TryParseInt(systemElement.Element("nextgid")?.Value ?? string.Empty),
+                DisableNatReflection = systemElement.Element("disablenatreflection") != null,
                 Timeservers = systemElement.Elements("timeservers")?.Select(ts => ts.Value ?? string.Empty).ToList(),
                 DisableSegmentationOffloading = systemElement.Element("disablesegmentationoffloading") != null,
                 DisableLargeReceiveOffloading = systemElement.Element("disablelargereceiveoffloading") != null,
@@ -35,7 +40,15 @@ namespace SolviaPfSenseConfigToDocx.Parsers
                 DNS2GW = systemElement.Element("dns2gw")?.Value ?? string.Empty,
                 SerialSpeed = TryParseInt(systemElement.Element("serialspeed")?.Value ?? string.Empty),
                 PrimaryConsole = systemElement.Element("primaryconsole")?.Value ?? string.Empty,
-                WebGUI = ParseWebGUIConfig(systemElement.Element("webgui"))
+                WebGUI = ParseWebGUIConfig(systemElement.Element("webgui")),
+                Optimization = systemElement.Element("optimization")?.Value ?? string.Empty,
+                BogonsIntervall = systemElement.Element("bogons")?.Element("interval")?.Value ?? string.Empty,
+                SshState = systemElement.Element("ssh")?.Element("enable")?.Value ?? string.Empty,
+                HnAltqEnable = systemElement.Element("hn_altq_enable")?.Value ?? string.Empty,
+                Language = systemElement.Element("language")?.Value ?? string.Empty,
+                Timezone = systemElement.Element("timezone")?.Value ?? string.Empty
+                
+
             };
 
             // Parse groups and users using other parsers
@@ -69,6 +82,11 @@ namespace SolviaPfSenseConfigToDocx.Parsers
         private int TryParseInt(string value)
         {
             return int.TryParse(value, out var result) ? result : 0;
+        }
+
+        public void HtmlDecodeTextOnly(XElement element)
+        {
+            element.HtmlDecodeTextOnly();
         }
     }
 }

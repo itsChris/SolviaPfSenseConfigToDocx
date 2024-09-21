@@ -36,6 +36,7 @@
             <CheckBox Content="Gateways" x:Name="chkGateways" IsChecked="true"/>
             <CheckBox Content="Aliases" x:Name="chkAliases" IsChecked="True"/>
             <CheckBox Content="Cronjobs" x:Name="chkCronJobs" IsChecked="True" />
+            <CheckBox Content="SysLog" x:Name="chkSysLog" IsChecked="True" />
             <CheckBox Content="Other Configurations" x:Name="chkOtherConfigs" IsChecked="true"/>
         </StackPanel>
     </Grid>

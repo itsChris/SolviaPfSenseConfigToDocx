@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml;
 using SolviaPfSenseConfigToDocx.CustomAttributes;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace SolviaPfSenseConfigToDocx.Helpers
 {
@@ -267,9 +268,21 @@ namespace SolviaPfSenseConfigToDocx.Helpers
                         // Skip this property
                         continue;
                     }
-                    // Get the property value (Value)
-                    var propertyValue = property.GetValue(obj)?.ToString() ?? "N/A";  // Handle null values
 
+                    string propertyValue;
+
+                    var secretAttr = property.GetCustomAttribute<SecretAttribute>();
+
+                    if (secretAttr != null && secretAttr.Exclude)
+                    {
+                        // Hide the property value
+                        propertyValue = "********";
+                    }
+                    else
+                    {
+                        // Get the property value (Value)
+                        propertyValue = property.GetValue(obj)?.ToString() ?? "N/A";  // Handle null values
+                    }
                     // Create a new table row
                     TableRow tableRow = new TableRow();
 

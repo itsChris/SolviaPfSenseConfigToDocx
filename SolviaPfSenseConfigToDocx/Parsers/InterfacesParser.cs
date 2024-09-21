@@ -1,4 +1,5 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
+using SolviaPfSenseConfigToDocx.ExtensionMethods;
 using SolviaPfSenseConfigToDocx.Factory;
 using System.Xml.Linq;
 
@@ -8,6 +9,8 @@ namespace SolviaPfSenseConfigToDocx.Parsers
     {
         public List<Interface> Parse(XElement interfacesElement)
         {
+            HtmlDecodeTextOnly(interfacesElement);
+
             var interfaces = new List<Interface>();
 
             foreach (var ifaceElement in interfacesElement.Elements())
@@ -28,6 +31,11 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             }
 
             return interfaces;
+        }
+
+        public void HtmlDecodeTextOnly(XElement element)
+        {
+            element.HtmlDecodeTextOnly();
         }
     }
 

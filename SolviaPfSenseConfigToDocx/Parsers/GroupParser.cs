@@ -1,4 +1,5 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
+using SolviaPfSenseConfigToDocx.ExtensionMethods;
 using SolviaPfSenseConfigToDocx.Factory;
 using System.Xml.Linq;
 
@@ -8,6 +9,8 @@ namespace SolviaPfSenseConfigToDocx.Parsers
     {
         public List<Group> Parse(XElement systemElement)
         {
+            HtmlDecodeTextOnly(systemElement);
+
             var groups = new List<Group>();
             foreach (var groupElement in systemElement.Elements("group"))
             {
@@ -21,6 +24,11 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             }
 
             return groups;
+        }
+
+        public void HtmlDecodeTextOnly(XElement element)
+        {
+            element.HtmlDecodeTextOnly();
         }
     }
 

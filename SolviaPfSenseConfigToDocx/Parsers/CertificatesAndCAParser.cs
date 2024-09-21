@@ -1,13 +1,22 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
+using SolviaPfSenseConfigToDocx.ExtensionMethods;
 using SolviaPfSenseConfigToDocx.Factory;
+using SolviaPfSenseConfigToDocx.Helpers;
 using System.Xml.Linq;
 
 namespace SolviaPfSenseConfigToDocx.Parsers
 {
     public class CertificatesAndCAParser : IParser<CertificateConfig>
     {
+        public void HtmlDecodeTextOnly(XElement element)
+        {
+            element.HtmlDecodeTextOnly();
+        }
+
         public CertificateConfig Parse(XElement rootElement)
         {
+            HtmlDecodeTextOnly(rootElement);
+
             var certificateConfig = new CertificateConfig
             {
                 Certificates = new List<Certificate>(),
@@ -24,8 +33,11 @@ namespace SolviaPfSenseConfigToDocx.Parsers
                     Type = certElement.Element("type")?.Value ?? string.Empty,
                     Cert = certElement.Element("crt")?.Value ?? string.Empty,
                     PrivateKey = certElement.Element("prv")?.Value ?? string.Empty,
-                    CARef = certElement.Element("caref")?.Value ?? string.Empty
+                    CARef = certElement.Element("caref")?.Value ?? string.Empty,
+
                 };
+
+                cert.Certi = CertificateHelper.DecodeBase64ToCertificate(cert.Cert);
 
                 certificateConfig.Certificates.Add(cert);
             }

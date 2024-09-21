@@ -1,9 +1,11 @@
 ﻿using SolviaPfSenseConfigToDocx.CustomAttributes;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SolviaPfSenseConfigToDocx.DataModels
 {
     public class Certificate
     {
+        public X509Certificate2 Certi { get;set; }
         // Properties from the SystemConfig context (e.g., user-related certificates)
         public string UID { get; set; }         // Unique ID for user-related certificates
         [Exclude(true)]

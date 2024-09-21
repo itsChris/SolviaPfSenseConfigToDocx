@@ -119,5 +119,11 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             var ipSecConnectionParser = new IpSecConnectionParser();
             return _parserFactory.ParseSection("ipsec", ipSecConnectionParser);
         }
+
+        internal SyslogConfig ParseSysLogConfig()
+        {
+            var syslogConfigParser = new SyslogConfigParser();
+            return _parserFactory.ParseSection("syslog", syslogConfigParser);
+        }
     }
 }

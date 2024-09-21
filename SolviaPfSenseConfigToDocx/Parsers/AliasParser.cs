@@ -1,4 +1,5 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
+using SolviaPfSenseConfigToDocx.ExtensionMethods;
 using SolviaPfSenseConfigToDocx.Factory;
 using System.Xml.Linq;
 
@@ -6,8 +7,14 @@ namespace SolviaPfSenseConfigToDocx.Parsers
 {
     internal class AliasParser : IParser<List<Alias>>
     {
+        public void HtmlDecodeTextOnly(XElement element)
+        {
+            element.HtmlDecodeTextOnly();
+        }
+
         public List<Alias> Parse(XElement element)
         {
+            HtmlDecodeTextOnly(element);
             var aliases = new List<Alias>();
             foreach (var alias in element.Elements("alias"))
             {

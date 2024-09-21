@@ -1,4 +1,5 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
+using SolviaPfSenseConfigToDocx.ExtensionMethods;
 using SolviaPfSenseConfigToDocx.Factory;
 using System.Xml.Linq;
 
@@ -8,6 +9,8 @@ namespace SolviaPfSenseConfigToDocx.Parsers
     {
         public DHCPConfig Parse(XElement dhcpElement)
         {
+            HtmlDecodeTextOnly(dhcpElement);
+
             var dhcpConfig = new DHCPConfig();
 
             // Parse DHCPv4 settings
@@ -106,6 +109,9 @@ namespace SolviaPfSenseConfigToDocx.Parsers
 
             return dhcpConfig;
         }
+        public void HtmlDecodeTextOnly(XElement element)
+        {
+            element.HtmlDecodeTextOnly();
+        }
     }
-
 }

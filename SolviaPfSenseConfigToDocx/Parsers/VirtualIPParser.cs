@@ -1,4 +1,5 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
+using SolviaPfSenseConfigToDocx.ExtensionMethods;
 using SolviaPfSenseConfigToDocx.Factory;
 using System.Xml.Linq;
 
@@ -8,6 +9,8 @@ namespace SolviaPfSenseConfigToDocx.Parsers
     {
         public List<VirtualIP> Parse(XElement element)
         {
+            HtmlDecodeTextOnly(element);
+
             var virtualIPs = new List<VirtualIP>();
             foreach (var vip in element.Elements("vip"))
             {
@@ -28,6 +31,11 @@ namespace SolviaPfSenseConfigToDocx.Parsers
         private int TryParseInt(string value)
         {
             return int.TryParse(value, out var result) ? result : 0;
+        }
+
+        public void HtmlDecodeTextOnly(XElement element)
+        {
+            element.HtmlDecodeTextOnly();
         }
     }
 }

@@ -31,15 +31,12 @@ namespace SolviaPfSenseConfigToDocx
         private List<Package> packages;
         private List<Service> services;
         private List<IpSecConnection> ipSecConnections;
+        private SyslogConfig sysLogConfig;
         private OtherConfigurations otherConfigs;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            // TODO
-            Services.WordDocumentService wordDocumentService = new Services.WordDocumentService();
-            wordDocumentService.CreateWordDocument("SampleDocument.docx");
         }
 
         private void SelectFileButton_Click(object sender, RoutedEventArgs e)
@@ -67,6 +64,7 @@ namespace SolviaPfSenseConfigToDocx
                 packages = pfSenseConfigParser.ParsePackages();
                 services = pfSenseConfigParser.ParseServices();
                 ipSecConnections = pfSenseConfigParser.ParseIpSecConnections();
+                sysLogConfig = pfSenseConfigParser.ParseSysLogConfig();
                 otherConfigs = pfSenseConfigParser.ParseOtherConfigurations();
             }
         }
@@ -204,6 +202,14 @@ namespace SolviaPfSenseConfigToDocx
                 {
                     DocumentHelper.AddHeading(body, "Cron Jobs", 1, mainPart);
                     ConfigDocumentGenerator.AddCronJobsToDocument(cronJobs, body, mainPart);
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+
+                // SysLog
+                if (chkSysLog.IsChecked == true)
+                {
+                    DocumentHelper.AddHeading(body, "SysLog", 1, mainPart);
+                    DocumentHelper.AddTableFromObject(body, sysLogConfig);
                     DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
                 }
                 // Other Configurations

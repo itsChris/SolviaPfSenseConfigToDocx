@@ -1,4 +1,5 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
+using SolviaPfSenseConfigToDocx.ExtensionMethods;
 using SolviaPfSenseConfigToDocx.Factory;
 using System.Xml.Linq;
 
@@ -8,6 +9,8 @@ namespace SolviaPfSenseConfigToDocx.Parsers
     {
         public OtherConfigurations Parse(XElement rootElement)
         {
+            HtmlDecodeTextOnly(rootElement);
+
             var otherConfigurations = new OtherConfigurations();
 
             // Parse Aliases
@@ -135,6 +138,10 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             }
 
             return otherConfigurations;
+        }
+        public void HtmlDecodeTextOnly(XElement element)
+        {
+            element.HtmlDecodeTextOnly();
         }
     }
 

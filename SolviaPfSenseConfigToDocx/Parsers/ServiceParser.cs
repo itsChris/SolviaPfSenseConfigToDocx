@@ -1,4 +1,5 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
+using SolviaPfSenseConfigToDocx.ExtensionMethods;
 using SolviaPfSenseConfigToDocx.Factory;
 using System.Xml.Linq;
 
@@ -8,6 +9,7 @@ namespace SolviaPfSenseConfigToDocx.Parsers
     {
         public List<Service> Parse(XElement element)
         {
+            HtmlDecodeTextOnly(element);
             var services = new List<Service>();
             foreach (var s in element.Elements("service"))
             {
@@ -21,6 +23,11 @@ namespace SolviaPfSenseConfigToDocx.Parsers
                 services.Add(svc);
             }
             return services;
+        }
+
+        public void HtmlDecodeTextOnly(XElement element)
+        {
+            element.HtmlDecodeTextOnly();
         }
     }
 }

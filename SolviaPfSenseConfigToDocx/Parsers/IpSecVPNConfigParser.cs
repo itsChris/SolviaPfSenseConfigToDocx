@@ -1,4 +1,5 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
+using SolviaPfSenseConfigToDocx.ExtensionMethods;
 using SolviaPfSenseConfigToDocx.Factory;
 using System.Xml.Linq;
 
@@ -8,6 +9,8 @@ namespace SolviaPfSenseConfigToDocx.Parsers
     {
         public IpSecVPNConfig Parse(XElement rootElement)
         {
+            HtmlDecodeTextOnly(rootElement);
+
             var vpnConfig = new IpSecVPNConfig
             {
                 IPsecPhase1Configs = new List<IPsecPhase1>(),
@@ -115,6 +118,11 @@ namespace SolviaPfSenseConfigToDocx.Parsers
         private int TryParseInt(string value)
         {
             return int.TryParse(value, out var result) ? result : 0;
+        }
+
+        public void HtmlDecodeTextOnly(XElement element)
+        {
+            element.HtmlDecodeTextOnly();
         }
     }
 }

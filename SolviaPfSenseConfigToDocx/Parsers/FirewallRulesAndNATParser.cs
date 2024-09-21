@@ -1,4 +1,5 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
+using SolviaPfSenseConfigToDocx.ExtensionMethods;
 using SolviaPfSenseConfigToDocx.Factory;
 using System.Xml.Linq;
 
@@ -8,6 +9,9 @@ namespace SolviaPfSenseConfigToDocx.Parsers
     {
         public FirewallConfig Parse(XElement firewallElement)
         {
+
+            HtmlDecodeTextOnly(firewallElement);
+
             var firewallConfig = new FirewallConfig();
 
             // Parse Firewall Rules
@@ -108,6 +112,9 @@ namespace SolviaPfSenseConfigToDocx.Parsers
 
             return firewallConfig;
         }
+        public void HtmlDecodeTextOnly(XElement element)
+        {
+            element.HtmlDecodeTextOnly();
+        }
     }
-
 }

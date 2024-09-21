@@ -1,4 +1,5 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
+using SolviaPfSenseConfigToDocx.ExtensionMethods;
 using SolviaPfSenseConfigToDocx.Factory;
 using System.Xml.Linq;
 
@@ -8,6 +9,8 @@ namespace SolviaPfSenseConfigToDocx.Parsers
     {
         List<CronJob> IParser<List<CronJob>>.Parse(XElement element)
         {
+            HtmlDecodeTextOnly(element);
+
             var cronJobs = new List<CronJob>();
 
             // Parse Cron Jobs
@@ -26,6 +29,11 @@ namespace SolviaPfSenseConfigToDocx.Parsers
                 cronJobs.Add(cronJob);
             }
             return cronJobs;
+        }
+
+        public void HtmlDecodeTextOnly(XElement element)
+        {
+            element.HtmlDecodeTextOnly();
         }
     }
 }
