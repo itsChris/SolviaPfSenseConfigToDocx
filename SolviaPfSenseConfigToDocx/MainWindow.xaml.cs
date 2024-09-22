@@ -32,6 +32,7 @@ namespace SolviaPfSenseConfigToDocx
         private List<Service> services;
         private List<IpSecConnection> ipSecConnections;
         private SyslogConfig sysLogConfig;
+        private OpenVPNServerConfig openVPNServerConfig;
         private OtherConfigurations otherConfigs;
 
         public MainWindow()
@@ -65,9 +66,60 @@ namespace SolviaPfSenseConfigToDocx
                 services = pfSenseConfigParser.ParseServices();
                 ipSecConnections = pfSenseConfigParser.ParseIpSecConnections();
                 sysLogConfig = pfSenseConfigParser.ParseSysLogConfig();
+                openVPNServerConfig = pfSenseConfigParser.ParseOpenVPNServerConfig();
                 otherConfigs = pfSenseConfigParser.ParseOtherConfigurations();
             }
         }
+
+        private void buttonGetClipboard_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Check if the clipboard contains text
+                if (Clipboard.ContainsText())
+                {
+                    // Get the XML content from the clipboard
+                    string clipboardXml = Clipboard.GetText();
+
+                    // Save the clipboard XML to a temporary file
+                    string tempFilePath = Path.GetTempFileName();
+                    File.WriteAllText(tempFilePath, clipboardXml);
+
+                    // Initialize the parser with the temporary file path
+                    pfSenseConfigParser = new PfSenseConfigParser(tempFilePath);
+
+                    // Parse each section (same as in SelectFileButton_Click)
+                    pfSense = pfSenseConfigParser.PfSense();
+                    systemConfig = pfSenseConfigParser.ParseSystemConfig();
+                    users = pfSenseConfigParser.ParseUsers();
+                    groups = pfSenseConfigParser.ParseGroups();
+                    interfaces = pfSenseConfigParser.ParseInterfaces();
+                    staticRoutes = pfSenseConfigParser.ParseStaticRoutes();
+                    dhcpConfig = pfSenseConfigParser.ParseDHCPConfig();
+                    firewallConfig = pfSenseConfigParser.ParseFirewallRulesAndNAT();
+                    certificatesAndCA = pfSenseConfigParser.ParseCertificatesAndCA();
+                    cronJobs = pfSenseConfigParser.ParseCronJobs();
+                    gateways = pfSenseConfigParser.ParseGateways();
+                    aliases = pfSenseConfigParser.ParseAliases();
+                    virtualIPs = pfSenseConfigParser.ParseVirtualIPs();
+                    packages = pfSenseConfigParser.ParsePackages();
+                    services = pfSenseConfigParser.ParseServices();
+                    ipSecConnections = pfSenseConfigParser.ParseIpSecConnections();
+                    sysLogConfig = pfSenseConfigParser.ParseSysLogConfig();
+                    openVPNServerConfig = pfSenseConfigParser.ParseOpenVPNServerConfig();
+                    otherConfigs = pfSenseConfigParser.ParseOtherConfigurations();
+                }
+                else
+                {
+                    MessageBox.Show("Clipboard does not contain valid XML content.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred while reading from the clipboard: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
 
         private void ExportToDocxButton_Click(object sender, RoutedEventArgs e)
         {
@@ -88,7 +140,14 @@ namespace SolviaPfSenseConfigToDocx
                 Body body = mainPart.Document.AppendChild(new Body());
 
                 // Add Title Page
-                DocumentHelper.AddTitlePage(body, $"Firewall Documentation for {textboxCustomerName.Text}");
+                DocumentHelper.AddTitlePage(body, $"Firewall Documentation","48");
+                DocumentHelper.AddTitlePage(body, $"for", "48");
+                DocumentHelper.AddTitlePage(body, $"{textboxCustomerName.Text}", "48");
+                DocumentHelper.AddTitlePage(body, $"Hostname: {systemConfig.Hostname}", "40");
+                DocumentHelper.AddTitlePage(body, $"pfSense Version: v{pfSense.Version}", "40");
+
+                DocumentHelper.AddTitlePage(body, $"Author: {textboxAuthor.Text}", "32");
+                DocumentHelper.AddTitlePage(body, $"Date: {datePicker.SelectedDate.Value.ToString("d")}", "32");
                 DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
 
                 // Add ToC
@@ -212,6 +271,15 @@ namespace SolviaPfSenseConfigToDocx
                     DocumentHelper.AddTableFromObject(body, sysLogConfig);
                     DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
                 }
+                // OpenVPN Server Configuration
+                if (chkOpenVpnServer.IsChecked == true)
+                {
+                    DocumentHelper.AddHeading(body, "OpenVPN Server Configuration", 1, mainPart);
+                    ConfigDocumentGenerator.AddOpenVpnServerConfigToDocument(openVPNServerConfig, body, mainPart);
+                    
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                }
+
                 // Other Configurations
                 if (chkOtherConfigs.IsChecked == true)
                 {

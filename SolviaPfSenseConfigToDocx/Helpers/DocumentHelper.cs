@@ -9,12 +9,12 @@ namespace SolviaPfSenseConfigToDocx.Helpers
 {
     public static class DocumentHelper
     {
-        public static void AddTitlePage(Body body, string title)
+        public static void AddTitlePage(Body body, string title, string fontSize)
         {
             Paragraph paraTitle = new Paragraph(new ParagraphProperties(new Justification() { Val = JustificationValues.Center }));
             Run runTitle = new Run();
             runTitle.Append(new Text(title));
-            RunProperties runPropertiesTitle = new RunProperties(new Bold(), new FontSize() { Val = "48" });
+            RunProperties runPropertiesTitle = new RunProperties(new Bold(), new FontSize() { Val = fontSize });
             runTitle.PrependChild(runPropertiesTitle);
 
             paraTitle.Append(runTitle);

@@ -1,7 +1,7 @@
 ﻿<Window x:Class="SolviaPfSenseConfigToDocx.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="PfSense Config Reader" Height="500" Width="600">
+        Title="PfSense Config Reader" Height="550" Width="600" Icon="/conversion.png">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -13,11 +13,25 @@
         </Grid.RowDefinitions>
 
         <!-- Select File Button -->
-        <Button Content="Select config.xml" Width="150" Height="30" HorizontalAlignment="Center" VerticalAlignment="Top" Click="SelectFileButton_Click" Margin="0,40,0,0" Grid.Row="0"/>
-        <Button Content="Export to Docx" Width="150" Height="30" HorizontalAlignment="Center" VerticalAlignment="Top" Click="ExportToDocxButton_Click" Margin="0,90,0,0" Grid.Row="0"/>
+        <Button x:Name="buttonSelectConfigFile" Content="Select config.xml" Width="150" Height="30" 
+                HorizontalAlignment="Center" VerticalAlignment="Top" 
+                Click="SelectFileButton_Click" Margin="0,10,0,0" Grid.Row="0"/>
+        <!-- Get from Clipboard -->
+        <Button x:Name="buttonGetClipboard" Content="Get config.xml from Clipboard" Width="180" Height="30" 
+                HorizontalAlignment="Left" VerticalAlignment="Top" Click="buttonGetClipboard_Click"
+                Margin="0,10,0,0" Grid.Row="0"/>
+        <Button Content="Export to Docx" Width="150" Height="30" HorizontalAlignment="Center" 
+                VerticalAlignment="Top" Click="ExportToDocxButton_Click" Margin="0,50,0,0" Grid.Row="0"/>
         <StackPanel Grid.Row="1">
             <Label x:Name="lblCustomerName" Content="Customer Name:" HorizontalAlignment="Left"/>
             <TextBox x:Name="textboxCustomerName" Text="Solvia GmbH, 8127 Forch, Switzerland"></TextBox>
+
+            <Label x:Name="lblDate" Content="Date:" HorizontalAlignment="Left"/>
+            <DatePicker x:Name="datePicker" SelectedDate="{x:Static sys:DateTime.Now}" xmlns:sys="clr-namespace:System;assembly=mscorlib" />
+
+            <Label x:Name="lblAuthor" Content="Author" />
+            <TextBox x:Name="textboxAuthor" Text="{x:Static sys:Environment.UserName}" xmlns:sys="clr-namespace:System;assembly=mscorlib" />
+
         </StackPanel>
         <!-- Checkboxes for configurations -->
         <StackPanel Orientation="Vertical" Grid.Row="2" Margin="10">
@@ -37,6 +51,7 @@
             <CheckBox Content="Aliases" x:Name="chkAliases" IsChecked="True"/>
             <CheckBox Content="Cronjobs" x:Name="chkCronJobs" IsChecked="True" />
             <CheckBox Content="SysLog" x:Name="chkSysLog" IsChecked="True" />
+            <CheckBox Content="OpenVPNServer" x:Name="chkOpenVpnServer" IsChecked="True" />
             <CheckBox Content="Other Configurations" x:Name="chkOtherConfigs" IsChecked="true"/>
         </StackPanel>
     </Grid>

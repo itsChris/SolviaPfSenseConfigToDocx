@@ -17,7 +17,7 @@ namespace SolviaPfSenseConfigToDocx.Services
                 Body body = mainPart.Document.AppendChild(new Body());
 
                 // Add Title Page
-                DocumentHelper.AddTitlePage(body, "Open XML SDK Word Document with TOC");
+                DocumentHelper.AddTitlePage(body, "Open XML SDK Word Document with TOC","48");
 
                 // Add the Table of Contents (ToC)
                 DocumentHelper.AddTableOfContents(body, mainPart);

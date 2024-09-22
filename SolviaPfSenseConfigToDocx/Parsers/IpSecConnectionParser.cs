@@ -21,10 +21,13 @@ namespace SolviaPfSenseConfigToDocx.Parsers
                 RemoteGateway = p1.Element("remote-gateway")?.Value ?? string.Empty,
                 Protocol = p1.Element("protocol")?.Value ?? string.Empty,
                 MyIDType = p1.Element("myid_type")?.Value ?? string.Empty,
+                MyIDData = p1.Element("myid_data")?.Value ?? string.Empty,  // MyIDData berücksichtigt
                 PeerIDType = p1.Element("peerid_type")?.Value ?? string.Empty,
+                PeerIDData = p1.Element("peerid_data")?.Value ?? string.Empty,  // PeerIDData berücksichtigt
                 Lifetime = TryParseInt(p1.Element("lifetime")?.Value ?? "0"),
-                RekeyTime = TryParseInt(p1.Element("rekey_time")?.Value ?? "0"),
-                RandTime = TryParseInt(p1.Element("rand_time")?.Value ?? "0"),
+                RekeyTime = TryParseInt(p1.Element("rekey_time")?.Value ?? "0"),  // RekeyTime berücksichtigt
+                ReauthTime = TryParseInt(p1.Element("reauth_time")?.Value ?? "0"),  // ReauthTime berücksichtigt
+                RandTime = TryParseInt(p1.Element("rand_time")?.Value ?? "0"),  // RandTime berücksichtigt
                 PreSharedKey = p1.Element("pre-shared-key")?.Value ?? string.Empty,
                 PrivateKey = p1.Element("private-key")?.Value ?? string.Empty,
                 CertRef = p1.Element("certref")?.Value ?? string.Empty,
@@ -33,12 +36,33 @@ namespace SolviaPfSenseConfigToDocx.Parsers
                 Caref = p1.Element("caref")?.Value ?? string.Empty,
                 AuthenticationMethod = p1.Element("authentication_method")?.Value ?? string.Empty,
                 Description = p1.Element("descr")?.Value ?? string.Empty,
-                NATTraversal = p1.Element("nat_traversal")?.Value == "on",
-                MOBIKE = p1.Element("mobike")?.Value == "off",
+                NATTraversal = p1.Element("nat_traversal")?.Value == "on",  // NATTraversal berücksichtigt
+                MOBIKE = p1.Element("mobike")?.Value == "on",
                 DPDDelay = TryParseInt(p1.Element("dpd_delay")?.Value ?? "0"),
                 DPDMaxFail = TryParseInt(p1.Element("dpd_maxfail")?.Value ?? "0"),
                 StartAction = p1.Element("startaction")?.Value ?? string.Empty,
-                CloseAction = p1.Element("closeaction")?.Value ?? string.Empty
+                CloseAction = p1.Element("closeaction")?.Value ?? string.Empty,
+
+                // Parse encryption algorithms
+                EncryptionAlgorithms = p1.Element("encryption")?
+                    .Elements("item")
+                    .Select(e => new EncryptionAlgorithm
+                    {
+                        Name = e.Element("encryption-algorithm")?.Element("name")?.Value ?? string.Empty,
+                        KeyLength = TryParseInt(e.Element("encryption-algorithm")?.Element("keylen")?.Value ?? "0"),
+                    }).ToList() ?? new List<EncryptionAlgorithm>(),
+
+                            HashAlgorithm = p1.Element("encryption")?
+                    .Element("item")?
+                    .Element("hash-algorithm")?.Value ?? string.Empty,
+
+                            PRFAlgorithm = p1.Element("encryption")?
+                    .Element("item")?
+                    .Element("prf-algorithm")?.Value ?? string.Empty,
+
+                            DHGroup = p1.Element("encryption")?
+                    .Element("item")?
+                    .Element("dhgroup")?.Value ?? string.Empty
             }).ToList();
 
             // Parse Phase 2 entries

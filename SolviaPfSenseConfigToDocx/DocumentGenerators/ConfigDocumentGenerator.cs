@@ -98,6 +98,15 @@ namespace SolviaPfSenseConfigToDocx.DocumentGenerators
             }
         }
 
+        internal static void AddOpenVpnServerConfigToDocument(OpenVPNServerConfig openVPNServerConfig, Body body, MainDocumentPart mainPart)
+        {
+            if (openVPNServerConfig == null)
+            {
+                DocumentHelper.AddParagraph(body, "No OpenVPN server configured.");
+            }
+            DocumentHelper.AddTableFromObject(body, openVPNServerConfig);
+        }
+
         internal static void AddUsersToDocument(List<User> users, Body body, MainDocumentPart mainPart)
         {
             if (users.Count == 0)
@@ -146,7 +155,7 @@ namespace SolviaPfSenseConfigToDocx.DocumentGenerators
 
         internal static void AddVirtualIPsToDocument(List<VirtualIP> virtualIPs, Body body, MainDocumentPart mainPart)
         {
-            if (virtualIPs.Count == 0)
+            if (virtualIPs == null || virtualIPs.Count == 0)
             {
                 DocumentHelper.AddParagraph(body, "No virtual IPs configured.");
             }
@@ -217,5 +226,7 @@ namespace SolviaPfSenseConfigToDocx.DocumentGenerators
                 DocumentHelper.InsertSectionBreak(body,SectionMarkValues.NextPage);
             }
         }
+
+
     }
 }

@@ -125,5 +125,11 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             var syslogConfigParser = new SyslogConfigParser();
             return _parserFactory.ParseSection("syslog", syslogConfigParser);
         }
+
+        internal OpenVPNServerConfig ParseOpenVPNServerConfig()
+        {
+            var openVPNServerConfigParser = new OpenVPNServerConfigParser();
+            return _parserFactory.ParseSection("openvpn", openVPNServerConfigParser);
+        }
     }
 }
