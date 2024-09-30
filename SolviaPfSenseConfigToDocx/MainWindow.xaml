@@ -15,13 +15,14 @@
         <!-- Select File Button -->
         <Button x:Name="buttonSelectConfigFile" Content="Select config.xml" Width="150" Height="30" 
                 HorizontalAlignment="Center" VerticalAlignment="Top" 
-                Click="SelectFileButton_Click" Margin="0,10,0,0" Grid.Row="0"/>
+                Click="SelectFileButton_Click" Margin="10" Grid.Row="0"/>
         <!-- Get from Clipboard -->
         <Button x:Name="buttonGetClipboard" Content="Get config.xml from Clipboard" Width="180" Height="30" 
                 HorizontalAlignment="Left" VerticalAlignment="Top" Click="buttonGetClipboard_Click"
-                Margin="0,10,0,0" Grid.Row="0"/>
-        <Button Content="Export to Docx" Width="150" Height="30" HorizontalAlignment="Center" 
-                VerticalAlignment="Top" Click="ExportToDocxButton_Click" Margin="0,50,0,0" Grid.Row="0"/>
+                Margin="10" Grid.Row="0"/>
+        <Button Content="Export to Docx" Width="150" Height="30" HorizontalAlignment="Right" 
+                
+                VerticalAlignment="Top" Click="ExportToDocxButton_Click" Margin="10" Grid.Row="0"/>
         <StackPanel Grid.Row="1">
             <Label x:Name="lblCustomerName" Content="Customer Name:" HorizontalAlignment="Left"/>
             <TextBox x:Name="textboxCustomerName" Text="Solvia GmbH, 8127 Forch, Switzerland"></TextBox>

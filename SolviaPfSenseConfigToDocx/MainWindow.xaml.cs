@@ -35,6 +35,8 @@ namespace SolviaPfSenseConfigToDocx
         private OpenVPNServerConfig openVPNServerConfig;
         private OtherConfigurations otherConfigs;
 
+        private string lastUsedPath = string.Empty; // Store the last used path
+
         public MainWindow()
         {
             InitializeComponent();
@@ -129,171 +131,187 @@ namespace SolviaPfSenseConfigToDocx
                 return;
             }
 
-            var docxPath = $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_SystemConfig.docx";
+            // Initialize SaveFileDialog
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                FileName = $"{DateTime.Now:yyyy-MM-dd-}{systemConfig.Hostname}-Documentation.docx",
+                Filter = "Word Documents (*.docx)|*.docx",
+                Title = "Save the Word Document"
+            };
 
-            using (WordprocessingDocument wordDoc = WordprocessingDocument.Create(docxPath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
+            // Set the initial directory to the last used path if available
+            if (!string.IsNullOrEmpty(lastUsedPath))
+            {
+                saveFileDialog.InitialDirectory = lastUsedPath;
+            }
+
+            if (saveFileDialog.ShowDialog() == true)
             {
 
-                // Add a main document part
-                MainDocumentPart mainPart = wordDoc.AddMainDocumentPart();
-                mainPart.Document = new Document();
-                Body body = mainPart.Document.AppendChild(new Body());
+                using (WordprocessingDocument wordDoc = WordprocessingDocument.Create(saveFileDialog.FileName, DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
+                {
 
-                // Add Title Page
-                DocumentHelper.AddTitlePage(body, $"Firewall Documentation","48");
-                DocumentHelper.AddTitlePage(body, $"for", "48");
-                DocumentHelper.AddTitlePage(body, $"{textboxCustomerName.Text}", "48");
-                DocumentHelper.AddTitlePage(body, $"Hostname: {systemConfig.Hostname}", "40");
-                DocumentHelper.AddTitlePage(body, $"pfSense Version: v{pfSense.Version}", "40");
+                    // Add a main document part
+                    MainDocumentPart mainPart = wordDoc.AddMainDocumentPart();
+                    mainPart.Document = new Document();
+                    Body body = mainPart.Document.AppendChild(new Body());
 
-                DocumentHelper.AddTitlePage(body, $"Author: {textboxAuthor.Text}", "32");
-                DocumentHelper.AddTitlePage(body, $"Date: {datePicker.SelectedDate.Value.ToString("d")}", "32");
-                DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    // Add Title Page
+                    DocumentHelper.AddTitlePage(body, $"Firewall Documentation", "48");
+                    DocumentHelper.AddTitlePage(body, $"for", "48");
+                    DocumentHelper.AddTitlePage(body, $"{textboxCustomerName.Text}", "48");
+                    DocumentHelper.AddTitlePage(body, $"Hostname: {systemConfig.Hostname}", "40");
+                    DocumentHelper.AddTitlePage(body, $"pfSense Version: v{pfSense.Version}", "40");
 
-                // Add ToC
-                DocumentHelper.AddTableOfContents(body, mainPart);
-                DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    DocumentHelper.AddTitlePage(body, $"Author: {textboxAuthor.Text}", "32");
+                    DocumentHelper.AddTitlePage(body, $"Date: {datePicker.SelectedDate.Value.ToString("d")}", "32");
+                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
 
-                // Add System Configuration
-                if (chkSystemConfig.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "System Configuration", 1, mainPart);
-                    ConfigDocumentGenerator.AddSystemConfigToDocument(systemConfig, body, mainPart);
+                    // Add ToC
+                    DocumentHelper.AddTableOfContents(body, mainPart);
                     DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
-                // Add IPSec VPN Configuration
-                if (chkIpSecVpnConfig.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "IPSec VPN Configuration", 1, mainPart);
-                    ConfigDocumentGenerator.AddIpSecVpnConfigToDocument(ipSecConnections, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
-                // Add Interfaces
-                if (chkInterfaces.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "Interfaces", 1, mainPart);
-                    ConfigDocumentGenerator.AddInterfaceConfigToDocument(interfaces, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
-                // Add Static Routes
-                if (chkStaticRoutes.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "Static Routes", 1, mainPart);
-                    ConfigDocumentGenerator.AddStaticRoutesToDocument(staticRoutes, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
-                // Add DHCP Configuration
-                if (chkDHCPConfig.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "DHCP Configuration", 1, mainPart);
-                    ConfigDocumentGenerator.AddDhcpConfigToDocument(dhcpConfig, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
-                // Add Firewall Configuration
-                if (chkFirewallConfig.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "Firewall Configuration", 1, mainPart);
-                    ConfigDocumentGenerator.AddFirewallConfigToDocument(firewallConfig, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
-                // Add Certificates and CA
-                if (chkCertificatesAndCA.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "Certificates and CA", 1, mainPart);
-                    ConfigDocumentGenerator.AddCertificatesAndCAToDocument(certificatesAndCA, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
-                // Users
-                if (chkUsers.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "Users", 1, mainPart);
-                    ConfigDocumentGenerator.AddUsersToDocument(users, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
-                // Groups
-                if (chkGroups.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "Groups", 1, mainPart);
-                    ConfigDocumentGenerator.AddGroupsToDocument(groups, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
 
-                // Packages
-                if (chkPackages.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "Packages", 1, mainPart);
-                    ConfigDocumentGenerator.AddPackagesToDocument(packages, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
+                    // Add System Configuration
+                    if (chkSystemConfig.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "System Configuration", 1, mainPart);
+                        ConfigDocumentGenerator.AddSystemConfigToDocument(systemConfig, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
+                    // Add IPSec VPN Configuration
+                    if (chkIpSecVpnConfig.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "IPSec VPN Configuration", 1, mainPart);
+                        ConfigDocumentGenerator.AddIpSecVpnConfigToDocument(ipSecConnections, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
+                    // Add Interfaces
+                    if (chkInterfaces.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "Interfaces", 1, mainPart);
+                        ConfigDocumentGenerator.AddInterfaceConfigToDocument(interfaces, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
+                    // Add Static Routes
+                    if (chkStaticRoutes.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "Static Routes", 1, mainPart);
+                        ConfigDocumentGenerator.AddStaticRoutesToDocument(staticRoutes, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
+                    // Add DHCP Configuration
+                    if (chkDHCPConfig.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "DHCP Configuration", 1, mainPart);
+                        ConfigDocumentGenerator.AddDhcpConfigToDocument(dhcpConfig, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
+                    // Add Firewall Configuration
+                    if (chkFirewallConfig.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "Firewall Configuration", 1, mainPart);
+                        ConfigDocumentGenerator.AddFirewallConfigToDocument(firewallConfig, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
+                    // Add Certificates and CA
+                    if (chkCertificatesAndCA.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "Certificates and CA", 1, mainPart);
+                        ConfigDocumentGenerator.AddCertificatesAndCAToDocument(certificatesAndCA, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
+                    // Users
+                    if (chkUsers.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "Users", 1, mainPart);
+                        ConfigDocumentGenerator.AddUsersToDocument(users, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
+                    // Groups
+                    if (chkGroups.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "Groups", 1, mainPart);
+                        ConfigDocumentGenerator.AddGroupsToDocument(groups, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
 
-                // Services
-                if (chkServices.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "Services", 1, mainPart);
-                    ConfigDocumentGenerator.AddServicesToDocument(services, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
-                // Virtual IPs
-                if (chkVirtualIps.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "Virtual IPs", 1, mainPart);
-                    ConfigDocumentGenerator.AddVirtualIPsToDocument(virtualIPs, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
-                // Gateways
-                if (chkGateways.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "Gateways", 1, mainPart);
-                    ConfigDocumentGenerator.AddGatewaysToDocument(gateways, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
+                    // Packages
+                    if (chkPackages.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "Packages", 1, mainPart);
+                        ConfigDocumentGenerator.AddPackagesToDocument(packages, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
 
-                // Aliases
-                if (chkAliases.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "Aliases", 1, mainPart);
-                    ConfigDocumentGenerator.AddAliasesToDocument(aliases, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
+                    // Services
+                    if (chkServices.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "Services", 1, mainPart);
+                        ConfigDocumentGenerator.AddServicesToDocument(services, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
+                    // Virtual IPs
+                    if (chkVirtualIps.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "Virtual IPs", 1, mainPart);
+                        ConfigDocumentGenerator.AddVirtualIPsToDocument(virtualIPs, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
+                    // Gateways
+                    if (chkGateways.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "Gateways", 1, mainPart);
+                        ConfigDocumentGenerator.AddGatewaysToDocument(gateways, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
 
-                // Cron Jobs
-                if (chkCronJobs.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "Cron Jobs", 1, mainPart);
-                    ConfigDocumentGenerator.AddCronJobsToDocument(cronJobs, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
+                    // Aliases
+                    if (chkAliases.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "Aliases", 1, mainPart);
+                        ConfigDocumentGenerator.AddAliasesToDocument(aliases, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
 
-                // SysLog
-                if (chkSysLog.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "SysLog", 1, mainPart);
-                    DocumentHelper.AddTableFromObject(body, sysLogConfig);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
-                // OpenVPN Server Configuration
-                if (chkOpenVpnServer.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "OpenVPN Server Configuration", 1, mainPart);
-                    ConfigDocumentGenerator.AddOpenVpnServerConfigToDocument(openVPNServerConfig, body, mainPart);
-                    
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
+                    // Cron Jobs
+                    if (chkCronJobs.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "Cron Jobs", 1, mainPart);
+                        ConfigDocumentGenerator.AddCronJobsToDocument(cronJobs, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
 
-                // Other Configurations
-                if (chkOtherConfigs.IsChecked == true)
-                {
-                    DocumentHelper.AddHeading(body, "Other Configurations", 1, mainPart);
-                    ConfigDocumentGenerator.AddOtherConfigsToDocument(otherConfigs, body, mainPart);
-                    DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
-                }
+                    // SysLog
+                    if (chkSysLog.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "SysLog", 1, mainPart);
+                        DocumentHelper.AddTableFromObject(body, sysLogConfig);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
+                    // OpenVPN Server Configuration
+                    if (chkOpenVpnServer.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "OpenVPN Server Configuration", 1, mainPart);
+                        ConfigDocumentGenerator.AddOpenVpnServerConfigToDocument(openVPNServerConfig, body, mainPart);
 
-                // Add Header and Footer
-                HeaderHelper.AddHeader(mainPart, $"Solvia - Firewall Documentation for {textboxCustomerName.Text}");
-                FooterHelper.AddFooter(mainPart, "Page ");
-                mainPart.Document.Save();
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
+
+                    // Other Configurations
+                    if (chkOtherConfigs.IsChecked == true)
+                    {
+                        DocumentHelper.AddHeading(body, "Other Configurations", 1, mainPart);
+                        ConfigDocumentGenerator.AddOtherConfigsToDocument(otherConfigs, body, mainPart);
+                        DocumentHelper.InsertSectionBreak(body, SectionMarkValues.NextPage);
+                    }
+
+                    // Add Header and Footer
+                    HeaderHelper.AddHeader(mainPart, $"Solvia - Firewall Documentation for {textboxCustomerName.Text}");
+                    FooterHelper.AddFooter(mainPart, "Page ");
+                    mainPart.Document.Save();
+                }
+                OpenFile(saveFileDialog.FileName);
             }
-            OpenFile(docxPath);
         }
         private void OpenFile(string filePath)
         {

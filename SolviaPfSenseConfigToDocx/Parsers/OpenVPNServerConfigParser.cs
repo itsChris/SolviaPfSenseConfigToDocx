@@ -1,8 +1,6 @@
 ﻿using SolviaPfSenseConfigToDocx.DataModels;
 using SolviaPfSenseConfigToDocx.ExtensionMethods;
 using SolviaPfSenseConfigToDocx.Factory;
-using SolviaPfSenseConfigToDocx.Helpers;
-using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace SolviaPfSenseConfigToDocx.Parsers
@@ -19,6 +17,9 @@ namespace SolviaPfSenseConfigToDocx.Parsers
             HtmlDecodeTextOnly(element);
 
             var openvpnserverElement = element.Element("openvpn-server");
+
+            if (openvpnserverElement == null)
+                return null;
 
             var openVpnServerConfig = new OpenVPNServerConfig
             {

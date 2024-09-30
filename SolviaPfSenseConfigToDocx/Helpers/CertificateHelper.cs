@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -120,8 +121,9 @@ namespace SolviaPfSenseConfigToDocx.Helpers
 
                 return certificate;
             }
-            catch { 
-            return null;
+            catch (Exception ex){ 
+                if (Debugger.IsAttached) Debugger.Break();
+                return null;
             }
         }
     }

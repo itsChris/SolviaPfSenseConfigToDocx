@@ -37,7 +37,11 @@ namespace SolviaPfSenseConfigToDocx.Parsers
 
                 };
 
-                cert.Certi = CertificateHelper.DecodeBase64ToCertificate(cert.Cert);
+                if (!string.IsNullOrEmpty(cert.Cert))
+                {
+                    cert.Certi = CertificateHelper.DecodeBase64ToCertificate(cert.Cert);
+                }
+
 
                 certificateConfig.Certificates.Add(cert);
             }
